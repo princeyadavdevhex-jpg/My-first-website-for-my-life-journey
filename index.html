@@ -30,11 +30,13 @@
         pre[class*="language-"] { border-radius: 0 0 8px 8px; margin: 0; background: #0d1117; }
         .edit-textarea { background: #0d1117; color: #c9d1d9; font-family: monospace; width: 100%; min-height: 250px; padding: 15px; border: none; outline: none; resize: vertical; }
         
-        .profile-banner {
-            background-image: url('https://prince-tech-labs-workspace.vercel.app/1774681471566.png');'); 
-            background-size: cover;
-            background-position: center;
-        }
+      .profile-banner {
+      background-image: url('https://prince-tech-labs-workspace.vercel.app/1774681471566.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+     }
+        
     </style>
 </head>
 <body>
@@ -79,7 +81,7 @@
                 <div className="animate-fade-in">
                     {/* Banner & Profile Info */}
                     <div className="w-full rounded-xl overflow-hidden github-border mb-10">
-                        <div className="w-full h-48 md:h-64 profile-banner relative"></div>
+                   <div className="w-full aspect-[16/9] md:aspect-[21/9] profile-banner relative"></div>
                         <div className="github-bg px-6 pb-6 relative">
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-end -mt-12 md:-mt-16 mb-4 relative z-10">
                                 <div className="flex items-end gap-4">
