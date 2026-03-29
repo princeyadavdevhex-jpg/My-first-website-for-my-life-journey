@@ -10,9 +10,9 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
 
@@ -42,12 +42,43 @@
 <body>
     <div id="root"></div>
 
-    <script type="text/babel">
+        <script type="text/babel">
         const { useState, useEffect, useRef } = React;
-                 // ==========================================
+
+        // ==========================================
+        // FIREBASE SETUP (Sirf ek baar chalega)
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "YAHAN_APNI_API_KEY_COPY_KARKE_DALNA", // Apne Firebase wale black box se copy karna!
+            authDomain: "work-space-packet.firebaseapp.com",
+            projectId: "work-space-packet",
+            storageBucket: "work-space-packet.appspot.com",
+            messagingSenderId: "841757590804",
+            appId: "1:841757590804:web:9cfe37ee00609b6c046e01"
+        };
+
+        if (!window.firebase.apps.length) {
+            window.firebase.initializeApp(firebaseConfig);
+        }
+        const auth = window.firebase.auth();
+        const githubProvider = new window.firebase.auth.GithubAuthProvider();
+
+        // ==========================================
         // SIGN UP MODAL COMPONENT
         // ==========================================
         function SignUpModal({ isOpen, onClose }) {
+            
+            // GITHUB LOGIN FUNCTION (Modal ke andar)
+            const handleGithubLogin = () => {
+                auth.signInWithPopup(githubProvider)
+                .then((result) => {
+                    alert("Welcome " + result.user.displayName + "! Login Successful 🚀");
+                    onClose(); // Login hote hi popup band ho jayega
+                }).catch((error) => {
+                    alert("Error: " + error.message);
+                });
+            };
+
             if (!isOpen) return null;
 
             return (
@@ -63,12 +94,18 @@
                         
                         {/* Social Login Buttons */}
                         <div className="flex flex-col gap-3 mb-6">
+                                                    {/* Social Login Buttons */}
+                        <div className="flex flex-col gap-3 mb-6">
                             <button className="flex items-center justify-center gap-3 w-full bg-white text-black font-bold py-2.5 rounded-md hover:bg-gray-200 transition-colors">
                                 <i className="fab fa-google text-red-500 text-lg"></i> Sign up with Google
                             </button>
-                            <button className="flex items-center justify-center gap-3 w-full bg-[#24292e] text-white font-bold py-2.5 rounded-md border border-[#30363d] hover:bg-[#30363d] transition-colors">
+                            
+                            {/* NAYA GITHUB BUTTON JISME onClick LAGA HAI */}
+                            <button type="button" onClick={handleGithubLogin} className="flex items-center justify-center gap-3 w-full bg-[#24292e] text-white font-bold py-2.5 rounded-md border border-[#30363d] hover:bg-[#30363d] transition-colors shadow-[0_0_10px_rgba(255,255,255,0.1)]">
                                 <i className="fab fa-github text-lg"></i> Sign up with GitHub
                             </button>
+                        </div>
+
                         </div>
 
                         {/* Divider */}
