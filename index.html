@@ -10,9 +10,14 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         body { background-color: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -28,29 +33,28 @@
         pre[class*="language-"] { border-radius: 0 0 8px 8px; margin: 0; background: #0d1117; }
         .edit-textarea { background: #0d1117; color: #c9d1d9; font-family: monospace; width: 100%; min-height: 250px; padding: 15px; border: none; outline: none; resize: vertical; }
         
-      .profile-banner {
-      background-image: url('https://prince-tech-labs-workspace.vercel.app/1774681471566.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-     }
-        
+        .profile-banner {
+            background-image: url('https://prince-tech-labs-workspace.vercel.app/1774681471566.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
-        <script type="text/babel">
+    <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
         // ==========================================
-        // FIREBASE SETUP (Sirf ek baar chalega)
+        // FIREBASE SETUP
         // ==========================================
         const firebaseConfig = {
-            apiKey: "AIzaSyAwrlhB5ZQFMaA6wmNC8oXp0_sWVAASrPY", // Apne Firebase wale black box se copy karna!
+            apiKey: "AIzaSyAwrlhB5ZQFMaA6wmNC8oXp0_sWVAASrPY", 
             authDomain: "work-space-packet.firebaseapp.com",
             projectId: "work-space-packet",
-            storageBucket: "work-space-packet.appspot.com",
+            storageBucket: "work-space-packet.appspot.com", 
             messagingSenderId: "841757590804",
             appId: "1:841757590804:web:9cfe37ee00609b6c046e01"
         };
@@ -66,12 +70,11 @@
         // ==========================================
         function SignUpModal({ isOpen, onClose }) {
             
-            // GITHUB LOGIN FUNCTION (Modal ke andar)
             const handleGithubLogin = () => {
                 auth.signInWithPopup(githubProvider)
                 .then((result) => {
                     alert("Welcome " + result.user.displayName + "! Login Successful 🚀");
-                    onClose(); // Login hote hi popup band ho jayega
+                    onClose(); 
                 }).catch((error) => {
                     alert("Error: " + error.message);
                 });
@@ -82,27 +85,134 @@
             return (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in transition-all">
                     <div className="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-md p-8 relative shadow-2xl">
-                        {/* Close Button */}
                         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
- 
+                            <i className="fas fa-times text-xl"></i>
+                        </button>
+                        
+                        <h2 className="text-2xl font-bold text-white mb-2 text-center">Join Workspace</h2>
+                        <p className="text-gray-400 text-sm text-center mb-6">Create an account to explore projects.</p>
+                        
+                        <div className="flex flex-col gap-3 mb-6">
+                            <button className="flex items-center justify-center gap-3 w-full bg-white text-black font-bold py-2.5 rounded-md hover:bg-gray-200 transition-colors">
+                                <i className="fab fa-google text-red-500 text-lg"></i> Sign up with Google
+                            </button>
+                            
+                            <button type="button" onClick={handleGithubLogin} className="flex items-center justify-center gap-3 w-full bg-[#24292e] text-white font-bold py-2.5 rounded-md border border-[#30363d] hover:bg-[#30363d] transition-colors shadow-[0_0_10px_rgba(255,255,255,0.1)]">
+                                <i className="fab fa-github text-lg"></i> Sign up with GitHub
+                            </button>
+                        </div>
 
-                        {/* Divider */}
-                        <div className="flex <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prince Yadav | Workspace</title>
-    
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="h-px bg-[#30363d] flex-1"></div>
+                            <span className="text-gray-500 text-xs uppercase font-semibold">Or continue with email</span>
+                            <div className="h-px bg-[#30363d] flex-1"></div>
+                        </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+                        <form onSubmit={(e) => { 
+                            e.preventDefault(); 
+                            alert("Sign up details submitted! Backend integration pending."); 
+                        }} className="flex flex-col gap-4">
+                            <div>
+                                <label className="block text-gray-300 text-sm font-semibold mb-1">Email Address</label>
+                                <input type="email" required placeholder="prince@example.com" className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors" />
+                            </div>
+                            <div>
+                                <label className="block text-gray-300 text-sm font-semibold mb-1">Password</label>
+                                <input type="password" required placeholder="••••••••" className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors" />
+                            </div>
+                            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-md transition-colors mt-2 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                                Create Account
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+        }
+                        
+        // ==========================================
+        // 1. NAVBAR COMPONENT
+        // ==========================================
+        function Navbar() {
+            const [isSignUpOpen, setIsSignUpOpen] = useState(false);
+
+            return (
+                <>
+                    <nav className="glass-header sticky top-0 z-50 border-b border-[#30363d]">
+                        <div className="max-w-6xl mx-auto px-4 py-3 grid grid-cols-3 items-center">
+                            <div className="flex items-center gap-2">
+                                <i className="fas fa-terminal text-blue-500 text-xl"></i>
+                                <span className="font-bold hidden md:block text-white">Workspace</span>
+                            </div>
+                            <div className="flex justify-center gap-6 text-sm font-semibold">
+                                <a href="#" className="text-white hover:text-blue-400 transition-colors">Home</a>
+                                <a href="#" className="text-gray-400 hover:text-white transition-colors">Projects</a>
+                                <a href="#" className="text-gray-400 hover:text-white transition-colors">About</a>
+                            </div>
+                            <div className="flex justify-end items-center gap-4">
+                                <a href="https://www.youtube.com/@PRINCE_TECHMOTION_LAB" target="_blank" className="text-gray-400 hover:text-red-500 transition-colors" title="YouTube"><i className="fab fa-youtube text-xl"></i></a>
+                                <a href="https://github.com/princeyadavdevhex-jpg" target="_blank" className="text-gray-400 hover:text-white transition-colors" title="GitHub"><i className="fab fa-github text-xl"></i></a>
+
+                                <button 
+                                    onClick={() => setIsSignUpOpen(true)}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-4 py-1.5 rounded-md transition-colors shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+                                    Sign Up
+                                </button>
+                            </div>
+                        </div>
+                    </nav>
+
+                    <SignUpModal isOpen={isSignUpOpen} onClose={() => setIsSignUpOpen(false)} />
+                </>
+            );
+        }
+
+        // ==========================================
+        // 2. HOME VIEW COMPONENT
+        // ==========================================
+        function HomeView() {
+            return (
+                <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
+                    <div className="w-full rounded-xl overflow-hidden github-border mb-10">
+                        <div className="w-full aspect-[16/9] md:aspect-[21/9] profile-banner relative"></div>
+                        <div className="github-bg px-6 pb-6 relative">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-end -mt-12 md:-mt-16 mb-4 relative z-10">
+                                <div className="flex items-end gap-4">
+                                    <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-[#161b22] overflow-hidden bg-[#0d1117] flex-shrink-0">
+                                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Prince" alt="Logo" className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="pb-2">
+                                        <h1 className="text-2xl md:text-3xl font-bold text-white">Prince Yadav</h1>
+                                        <p className="text-gray-400 text-sm">@princeyadav • C++ & Tech Explorer</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ==========================================
+        // 3. MAIN APP COMPONENT
+        // ==========================================
+        function App() {
+            return (
+                <div>
+                    <Navbar />
+                    <HomeView />
+                </div>
+            );
+        }
+
+        // ==========================================
+        // REACT DOM RENDER
+        // ==========================================
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+
+    </script>
+</body>
+</html>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
 
     <style>
@@ -610,7 +720,7 @@ items-center gap-3 mb-6">
             };
 
             const handleGoBack = () => {
-                setView('home');
+                setView('home'); 
                 window.scrollTo(0, 0);
             };
 
