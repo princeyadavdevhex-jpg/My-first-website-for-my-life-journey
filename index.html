@@ -44,35 +44,102 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
+                 // ==========================================
+        // SIGN UP MODAL COMPONENT
+        // ==========================================
+        function SignUpModal({ isOpen, onClose }) {
+            if (!isOpen) return null;
 
-        // ==========================================
-        // 1. NAVBAR COMPONENT
-        // ==========================================
-        function Navbar() {
             return (
-                <nav className="glass-header sticky top-0 z-50 border-b border-[#30363d]">
-                    <div className="max-w-6xl mx-auto px-4 py-3 grid grid-cols-3 items-center">
-                        <div className="flex items-center gap-2">
-                            <i className="fas fa-terminal text-blue-500 text-xl"></i>
-                            <span className="font-bold hidden md:block text-white">Workspace</span>
-                        </div>
-                        <div className="flex justify-center gap-6 text-sm font-semibold">
-                            <a href="#" className="text-white hover:text-blue-400 transition-colors">Home</a>
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors">Projects</a>
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors">About</a>
-                        </div>
-                        <div className="flex justify-end items-center gap-4">
-                            <a href="https://www.youtube.com/@PRINCE_TECHMOTION_LAB" target="_blank" className="text-gray-400 hover:text-red-500 transition-colors" title="YouTube"><i className="fab fa-youtube text-xl"></i></a>
-                            <a href="https://github.com/princeyadavdevhex-jpg" target="_blank" className="text-gray-400 hover:text-white transition-colors" title="GitHub"><i className="fab fa-github text-xl"></i></a>
-
-                            <button className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-4 py-1.5 rounded-md transition-colors shadow-[0_0_10px_rgba(59,130,246,0.3)]">
-                                Sign Up
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in transition-all">
+                    <div className="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-md p-8 relative shadow-2xl">
+                        {/* Close Button */}
+                        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                            <i className="fas fa-times text-xl"></i>
+                        </button>
+                        
+                        <h2 className="text-2xl font-bold text-white mb-2 text-center">Join Workspace</h2>
+                        <p className="text-gray-400 text-sm text-center mb-6">Create an account to explore projects.</p>
+                        
+                        {/* Social Login Buttons */}
+                        <div className="flex flex-col gap-3 mb-6">
+                            <button className="flex items-center justify-center gap-3 w-full bg-white text-black font-bold py-2.5 rounded-md hover:bg-gray-200 transition-colors">
+                                <i className="fab fa-google text-red-500 text-lg"></i> Sign up with Google
+                            </button>
+                            <button className="flex items-center justify-center gap-3 w-full bg-[#24292e] text-white font-bold py-2.5 rounded-md border border-[#30363d] hover:bg-[#30363d] transition-colors">
+                                <i className="fab fa-github text-lg"></i> Sign up with GitHub
                             </button>
                         </div>
+
+                        {/* Divider */}
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="h-px bg-[#30363d] flex-1"></div>
+                            <span className="text-gray-500 text-xs uppercase font-semibold">Or continue with email</span>
+                            <div className="h-px bg-[#30363d] flex-1"></div>
+                        </div>
+
+                        {/* Email / Password Form */}
+                        <form onSubmit={(e) => { 
+                            e.preventDefault(); 
+                            alert("Sign up details submitted! Backend integration pending."); 
+                        }} className="flex flex-col gap-4">
+                            <div>
+                                <label className="block text-gray-300 text-sm font-semibold mb-1">Email Address</label>
+                                <input type="email" required placeholder="prince@example.com" className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors" />
+                            </div>
+                            <div>
+                                <label className="block text-gray-300 text-sm font-semibold mb-1">Password</label>
+                                <input type="password" required placeholder="••••••••" className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors" />
+                            </div>
+                            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-md transition-colors mt-2 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                                Create Account
+                            </button>
+                        </form>
                     </div>
-                </nav>
+                </div>
+            );
+                    }
+                        
+        //         // ==========================================
+        // 1. NAVBAR COMPONENT (UPDATED)
+        // ==========================================
+        function Navbar() {
+            // Modal ko open/close karne ke liye state
+            const [isSignUpOpen, setIsSignUpOpen] = useState(false);
+
+            return (
+                <>
+                    <nav className="glass-header sticky top-0 z-50 border-b border-[#30363d]">
+                        <div className="max-w-6xl mx-auto px-4 py-3 grid grid-cols-3 items-center">
+                            <div className="flex items-center gap-2">
+                                <i className="fas fa-terminal text-blue-500 text-xl"></i>
+                                <span className="font-bold hidden md:block text-white">Workspace</span>
+                            </div>
+                            <div className="flex justify-center gap-6 text-sm font-semibold">
+                                <a href="#" className="text-white hover:text-blue-400 transition-colors">Home</a>
+                                <a href="#" className="text-gray-400 hover:text-white transition-colors">Projects</a>
+                                <a href="#" className="text-gray-400 hover:text-white transition-colors">About</a>
+                            </div>
+                            <div className="flex justify-end items-center gap-4">
+                                <a href="https://www.youtube.com/@PRINCE_TECHMOTION_LAB" target="_blank" className="text-gray-400 hover:text-red-500 transition-colors" title="YouTube"><i className="fab fa-youtube text-xl"></i></a>
+                                <a href="https://github.com/princeyadavdevhex-jpg" target="_blank" className="text-gray-400 hover:text-white transition-colors" title="GitHub"><i className="fab fa-github text-xl"></i></a>
+
+                                {/* Sign Up Button par onClick laga diya gaya hai */}
+                                <button 
+                                    onClick={() => setIsSignUpOpen(true)}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-4 py-1.5 rounded-md transition-colors shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+                                    Sign Up
+                                </button>
+                            </div>
+                        </div>
+                    </nav>
+
+                    {/* Modal yahan render hoga jab state true hogi */}
+                    <SignUpModal isOpen={isSignUpOpen} onClose={() => setIsSignUpOpen(false)} />
+                </>
             );
         }
+
 
         // ==========================================
         // 2. HOME VIEW COMPONENT
