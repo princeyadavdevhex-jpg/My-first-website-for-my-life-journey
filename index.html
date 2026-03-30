@@ -238,16 +238,28 @@
                                 <div className="flex gap-2">
                                     <button onClick={()=>alert('Copied!')} className="text-xs bg-[#30363d] text-white px-3 py-1.5 rounded"><i className="fas fa-copy"></i> Copy</button>
                                     <button onClick={async () => {
-         const suggestion = prompt("Code mein kya change karna chahiye? (Apna message likhein):");
+    // 1. Check karo user login hai ya nahi
+    const user = window.firebase.auth().currentUser;
+    
+    if (!user) {
+        alert("Bhai, pehle Login/Sign Up karo tabhi toh Prince ko pata chalega kaun ho tum!");
+        return;
+    }
+
+    // 2. Sirf message pucho
+    const suggestion = prompt("Code mein kya change karna chahiye?");
+    
     if (suggestion) {
         try {
             await db.collection("edit_requests").add({
+                user_email: user.email, // Yeh apne aap login user ka email utha lega!
+                user_name: user.displayName || "Workspace User",
                 project: projectName,
                 file: openedFile,
                 message: suggestion,
                 timestamp: window.firebase.firestore.FieldValue.serverTimestamp()
             });
-            alert("Aapki request Prince ke database mein save ho gayi hai! 🚀");
+            alert("Request Prince ke paas pahunch gayi hai! 🚀");
         } catch (error) {
             alert("Error: " + error.message);
         }
@@ -255,6 +267,7 @@
 }} className="text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white px-3 py-1.5 rounded transition-colors shadow-[0_0_8px_rgba(234,88,12,0.4)]">
     <i className="fas fa-code-pull-request mr-1"></i> Request Edit
 </button>
+
 
                                 </div>
                             </div>
