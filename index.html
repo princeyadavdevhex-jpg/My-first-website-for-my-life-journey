@@ -13,10 +13,8 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
 
@@ -26,13 +24,12 @@
         .github-bg { background-color: #161b22; }
         .glass-header { background: rgba(13, 17, 23, 0.9); backdrop-filter: blur(10px); }
         
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0d1117; }
         ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #8b949e; }
 
         pre[class*="language-"] { border-radius: 0 0 8px 8px; margin: 0; background: #0d1117; }
-        .edit-textarea { background: #0d1117; color: #c9d1d9; font-family: monospace; width: 100%; min-height: 250px; padding: 15px; border: none; outline: none; resize: vertical; }
         
         .profile-banner {
             background-image: url('https://prince-tech-labs-workspace.vercel.app/1774681471566.png');
@@ -46,10 +43,10 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        const { useState } = React;
 
         // ==========================================
-        // FIREBASE SETUP & DATABASE
+        // SAFE FIREBASE SETUP
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyAwrlhB5ZQFMaA6wmNC8oXp0_sWVAASrPY", 
@@ -64,56 +61,15 @@
             window.firebase.initializeApp(firebaseConfig);
         }
         const auth = window.firebase.auth();
-        const db = window.firebase.firestore();
-        const githubProvider = new window.firebase.auth.GithubAuthProvider();
-        const googleProvider = new window.firebase.auth.GoogleAuthProvider();
-
-        const saveUserToDB = (user) => {
-            if(!user) return;
-            db.collection("users").doc(user.uid).set({
-                email: user.email,
-                name: user.displayName || "Workspace User",
-                photoURL: user.photoURL || "",
-                lastLogin: window.firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true }).catch(err => console.log("DB Error:", err));
-        };
 
         // ==========================================
-        // SIGN UP MODAL COMPONENT
+        // SIGN UP MODAL (Pure UI)
         // ==========================================
         function SignUpModal({ isOpen, onClose }) {
-            const [email, setEmail] = useState("");
-            const [password, setPassword] = useState("");
-
-            const handleGithubLogin = () => {
-                auth.signInWithPopup(githubProvider).then((result) => {
-                    saveUserToDB(result.user);
-                    alert("Welcome " + result.user.displayName + "! Login Successful 🚀");
-                    onClose(); 
-                }).catch((error) => alert("Error: " + error.message));
-            };
-
-            const handleGoogleLogin = () => {
-                auth.signInWithPopup(googleProvider).then((result) => {
-                    saveUserToDB(result.user);
-                    alert("Welcome " + result.user.displayName + "! Login Successful 🚀");
-                    onClose(); 
-                }).catch((error) => alert("Error: " + error.message));
-            };
-
-            const handleEmailSignup = (e) => {
-                e.preventDefault();
-                auth.createUserWithEmailAndPassword(email, password).then((userCredential) => {
-                    saveUserToDB(userCredential.user);
-                    alert("Account Created! Welcome 🚀");
-                    onClose();
-                }).catch((error) => alert("Error: " + error.message));
-            };
-
             if (!isOpen) return null;
 
             return (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in transition-all">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm transition-all">
                     <div className="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-md p-8 relative shadow-2xl">
                         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
                             <i className="fas fa-times text-xl"></i>
@@ -122,11 +78,11 @@
                         <h2 className="text-2xl font-bold text-white mb-2 text-center">Join Workspace</h2>
                         
                         <div className="flex flex-col gap-3 mb-6 mt-4">
-                            <button onClick={handleGoogleLogin} className="flex items-center justify-center gap-3 w-full bg-white text-black font-bold py-2.5 rounded-md hover:bg-gray-200">
+                            <button className="flex items-center justify-center gap-3 w-full bg-white text-black font-bold py-2.5 rounded-md hover:bg-gray-200 transition-colors">
                                 <i className="fab fa-google text-red-500 text-lg"></i> Sign up with Google
                             </button>
                             
-                            <button onClick={handleGithubLogin} className="flex items-center justify-center gap-3 w-full bg-[#24292e] text-white font-bold py-2.5 rounded-md border border-[#30363d] hover:bg-[#30363d]">
+                            <button className="flex items-center justify-center gap-3 w-full bg-[#24292e] text-white font-bold py-2.5 rounded-md border border-[#30363d] hover:bg-[#30363d] transition-colors">
                                 <i className="fab fa-github text-lg"></i> Sign up with GitHub
                             </button>
                         </div>
@@ -137,16 +93,16 @@
                             <div className="h-px bg-[#30363d] flex-1"></div>
                         </div>
 
-                        <form onSubmit={handleEmailSignup} className="flex flex-col gap-4">
+                        <form onSubmit={(e) => { e.preventDefault(); alert("Signup UI Working!"); }} className="flex flex-col gap-4">
                             <div>
                                 <label className="block text-gray-300 text-sm font-semibold mb-1">Email Address</label>
-                                <input type="email" required placeholder="prince@example.com" value={email} onChange={(e)=>setEmail(e.target.value)} className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500" />
+                                <input type="email" required placeholder="prince@example.com" className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors" />
                             </div>
                             <div>
                                 <label className="block text-gray-300 text-sm font-semibold mb-1">Password</label>
-                                <input type="password" required placeholder="••••••••" value={password} onChange={(e)=>setPassword(e.target.value)} className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500" />
+                                <input type="password" required placeholder="••••••••" className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors" />
                             </div>
-                            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-md mt-2 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-md transition-colors mt-2">
                                 Create Account
                             </button>
                         </form>
@@ -156,51 +112,78 @@
         }
                         
         // ==========================================
-        // 1. NAVBAR COMPONENT
+        // NAVBAR COMPONENT
         // ==========================================
-        function Navbar({ setView, onOpenProject, user }) {
+        function Navbar({ setView }) {
             const [isSignUpOpen, setIsSignUpOpen] = useState(false);
 
             return (
                 <>
                     <nav className="glass-header sticky top-0 z-50 border-b border-[#30363d]">
-                        <div className="max-w-6xl mx-auto px-4 py-3 grid grid-cols-1 md:grid-cols-3 items-center gap-4">
+                        <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+                            
+                            {/* Logo */}
                             <div className="flex items-center gap-2 cursor-pointer" onClick={() => setView('home')}>
                                 <i className="fas fa-terminal text-blue-500 text-xl"></i>
-                                <span className="font-bold text-white">Workspace</span>
+                                <span className="font-bold hidden md:block text-white">Workspace</span>
                             </div>
+                            
+                            {/* Links */}
                             <div className="flex justify-center gap-6 text-sm font-semibold">
-                                <span onClick={() => setView('home')} className="text-gray-400 hover:text-white transition-colors cursor-pointer">Home</span>
-                                <span onClick={() => onOpenProject('2D Projects')} className="text-gray-400 hover:text-white transition-colors cursor-pointer"><i className="fas fa-folder text-yellow-500 mr-1"></i>2D Projects</span>
-                                <span onClick={() => onOpenProject('Real Hardware Project')} className="text-gray-400 hover:text-white transition-colors cursor-pointer"><i className="fas fa-microchip text-green-500 mr-1"></i>Real Hardware Project</span>
+                                <span onClick={() => setView('home')} className="text-white hover:text-blue-400 transition-colors cursor-pointer">Home</span>
+                                <span onClick={() => setView('2D Projects')} className="text-gray-400 hover:text-white transition-colors cursor-pointer">2D Projects</span>
+                                <span onClick={() => setView('Real Hardware Project')} className="text-gray-400 hover:text-white transition-colors cursor-pointer">Real Hardware Project</span>
                             </div>
+                            
+                            {/* Socials & Signup */}
                             <div className="flex justify-end items-center gap-4">
-                                <a href="https://www.youtube.com/@PRINCE_TECHMOTION_LAB" target="_blank" className="text-gray-400 hover:text-red-500 transition-colors" title="YouTube"><i className="fab fa-youtube text-xl"></i></a>
-                                <a href="https://github.com/princeyadavdevhex-jpg" target="_blank" className="text-gray-400 hover:text-white transition-colors" title="GitHub"><i className="fab fa-github text-xl"></i></a>
-
-                                {/* Login Logic - Display profile if logged in */}
-                                {user ? (
-                                    <div className="flex items-center gap-3">
-                                        <img src={user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${user.email}`} className="w-8 h-8 rounded-full border border-[#30363d]" title={user.email} />
-                                        <button onClick={() => auth.signOut()} className="text-red-400 hover:text-red-500 text-sm font-bold">Logout</button>
-                                    </div>
-                                ) : (
-                                    <button onClick={() => setIsSignUpOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-4 py-1.5 rounded-md transition-colors shadow-[0_0_10px_rgba(59,130,246,0.3)]">
-                                        Sign Up
-                                    </button>
-                                )}
+                                <a href="https://www.youtube.com/@PRINCE_TECHMOTION_LAB" target="_blank" className="text-gray-400 hover:text-red-500 transition-colors"><i className="fab fa-youtube text-xl"></i></a>
+                                <a href="https://github.com/princeyadavdevhex-jpg" target="_blank" className="text-gray-400 hover:text-white transition-colors"><i className="fab fa-github text-xl"></i></a>
+                                <button onClick={() => setIsSignUpOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-4 py-1.5 rounded-md shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+                                    Sign Up
+                                </button>
                             </div>
                         </div>
                     </nav>
+
                     <SignUpModal isOpen={isSignUpOpen} onClose={() => setIsSignUpOpen(false)} />
                 </>
             );
         }
 
         // ==========================================
-        // 2. HOME VIEW COMPONENT (Tumhara Exact Original Layout)
+        // BLANK FOLDER VIEW (Jisme tum aage files add karoge)
         // ==========================================
-        function HomeView({ onOpenProject }) {
+        function FolderView({ folderName, goBack }) {
+            return (
+                <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
+                    <button onClick={goBack} className="mb-6 text-blue-400 hover:text-white font-semibold flex items-center gap-2">
+                        <i className="fas fa-arrow-left"></i> Back to Home
+                    </button>
+                    
+                    <div className="github-border github-bg rounded-xl p-8 min-h-[500px]">
+                        <h2 className="text-3xl font-bold text-white mb-4 border-b border-[#30363d] pb-4">
+                            <i className="fas fa-folder-open text-yellow-500 mr-3"></i> {folderName}
+                        </h2>
+                        
+                        <p className="text-gray-400 mb-8">
+                            Welcome to the {folderName} workspace. You can create multiple files and lines of code here later.
+                        </p>
+
+                        {/* YAHAN TUM APNA CODE YA MULTIPLE FILES WALA SYSTEM BANA SAKTE HO LATER */}
+                        <div className="border border-dashed border-[#30363d] rounded-lg p-10 flex flex-col items-center justify-center text-gray-500">
+                            <i className="fas fa-plus-circle text-4xl mb-3 text-blue-500/50"></i>
+                            <p>Upload files or create new code files here</p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ==========================================
+        // HOME VIEW (Tumhara Exact Original Layout)
+        // ==========================================
+        function HomeView({ setView }) {
             return (
                 <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
                     {/* Banner & Profile Info */}
@@ -248,7 +231,8 @@
                             </div>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div onClick={() => onOpenProject('2D Projects')} className="github-border github-bg rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors group">
+                                {/* Folder 1: 2D Projects */}
+                                <div onClick={() => setView('2D Projects')} className="github-border github-bg rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors group">
                                     <div className="flex items-start gap-3">
                                         <i className="fas fa-gamepad text-gray-500 mt-1 group-hover:text-pink-400 transition-colors"></i>
                                         <div>
@@ -260,7 +244,8 @@
                                     </div>
                                 </div>
 
-                                <div onClick={() => onOpenProject('Real Hardware Project')} className="github-border github-bg rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors group">
+                                {/* Folder 2: Real Hardware Project */}
+                                <div onClick={() => setView('Real Hardware Project')} className="github-border github-bg rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors group">
                                     <div className="flex items-start gap-3">
                                         <i className="fas fa-microchip text-gray-500 mt-1 group-hover:text-green-400 transition-colors"></i>
                                         <div>
@@ -272,13 +257,14 @@
                                     </div>
                                 </div>
 
-                                <div onClick={() => onOpenProject('Nexus OS Architecture')} className="github-border github-bg rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors group">
+                                {/* Folder 3: Nexus OS */}
+                                <div onClick={() => setView('Nexus OS Architecture')} className="github-border github-bg rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors group">
                                     <div className="flex items-start gap-3">
                                         <i className="fas fa-laptop-code text-gray-500 mt-1 group-hover:text-blue-400 transition-colors"></i>
                                         <div>
                                             <h3 className="text-blue-400 font-semibold group-hover:underline text-lg">Nexus OS</h3>
                                             <div className="flex items-center gap-4 mt-2 text-xs text-gray-400">
-                                                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500"></span> C++ / Assembly</span>
+                                                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500"></span> Assembly</span>
                                             </div>
                                         </div>
                                     </div>
@@ -291,4 +277,38 @@
                                 <div className="text-gray-300 text-sm leading-relaxed font-mono">
                                     <p className="mb-2">&gt; Hi, I'm Prince! 👋</p>
                                     <p className="mb-2">&gt; I am a student at JNV Prayagraj passionate about system architectures, web dev, and coding.</p>
-                        
+                                    <p className="mb-2">&gt; Feel free to open any project folder above, review my code, and propose edits if you find bugs!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ==========================================
+        // MAIN APP COMPONENT
+        // ==========================================
+        function App() {
+            const [currentView, setCurrentView] = useState('home'); 
+
+            return (
+                <div>
+                    <Navbar setView={setCurrentView} />
+                    
+                    {currentView === 'home' && <HomeView setView={setCurrentView} />}
+                    
+                    {currentView !== 'home' && <FolderView folderName={currentView} goBack={() => setCurrentView('home')} />}
+                </div>
+            );
+        }
+
+        // Error-Proof Render
+        const rootElement = document.getElementById('root');
+        if (rootElement) {
+            const root = ReactDOM.createRoot(rootElement);
+            root.render(<App />);
+        }
+    </script>
+</body>
+</html>
