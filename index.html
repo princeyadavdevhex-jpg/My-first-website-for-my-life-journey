@@ -111,9 +111,39 @@
             );
         }
                         
-        // ==========================================
+                // ==========================================
         // NAVBAR COMPONENT
         // ==========================================
+        function Navbar({ setView, onOpenProject }) {
+            const [isSignUpOpen, setIsSignUpOpen] = useState(false);
+
+            return (
+                <>
+                    <nav className="glass-header sticky top-0 z-50 border-b border-[#30363d]">
+                        <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+                            <div className="flex items-center gap-2 cursor-pointer" onClick={() => setView('home')}>
+                                <i className="fas fa-terminal text-blue-500 text-xl"></i>
+                                <span className="font-bold hidden md:block text-white">Workspace</span>
+                            </div>
+                            <div className="flex justify-center gap-6 text-sm font-semibold">
+                                <span onClick={() => setView('home')} className="text-white hover:text-blue-400 transition-colors cursor-pointer">Home</span>
+                                <span onClick={() => onOpenProject('2D Projects')} className="text-gray-400 hover:text-white transition-colors cursor-pointer">2D Projects</span>
+                                <span onClick={() => onOpenProject('Real Hardware Project')} className="text-gray-400 hover:text-white transition-colors cursor-pointer">Real Hardware Project</span>
+                            </div>
+                            <div className="flex justify-end items-center gap-4">
+                                <a href="https://www.youtube.com/@PRINCE_TECHMOTION_LAB" target="_blank" className="text-gray-400 hover:text-red-500 transition-colors"><i className="fab fa-youtube text-xl"></i></a>
+                                <a href="https://github.com/princeyadavdevhex-jpg" target="_blank" className="text-gray-400 hover:text-white transition-colors"><i className="fab fa-github text-xl"></i></a>
+                                <button onClick={() => setIsSignUpOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-4 py-1.5 rounded-md shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+                                    Sign Up
+                                </button>
+                            </div>
+                        </div>
+                    </nav>
+                    <SignUpModal isOpen={isSignUpOpen} onClose={() => setIsSignUpOpen(false)} />
+                </>
+            );
+        }
+
         // ==========================================
         // MAIN APP COMPONENT
         // ==========================================
@@ -127,15 +157,14 @@
             };
 
             return (
-                
-            {     <div className="flex justify-center gap-6 text-sm font-semibold">
-                        <span onClick={() => setView('home')} className="text-white hover:text-blue-400 transition-colors cursor-pointer">Home</span>
-                        <span onClick={() => setView('2D Projects')} className="text-gray-400 hover:text-white transition-colors cursor-pointer">2D Projects</span>
-                        <span onClick={() => setView('Real Hardware Project')} className="text-gray-400 hover:text-white transition-colors cursor-pointer">Real Hardware Project</span>
-                            </div>
-
+                <div>
+                    <Navbar setView={setCurrentView} onOpenProject={handleOpenProject} />
+                    {currentView === 'home' && <HomeView onOpenProject={handleOpenProject} />}
+                    {currentView === 'project' && <ProjectView projectName={activeProject} goBack={() => setCurrentView('home')} />}
+                </div>
             );
         }
+
 
 
         // ==========================================
@@ -218,8 +247,9 @@
                             </div>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Folder 1: 2D Projects */}
+                       {/* Folder 1: 2D Projects */}
                                 <div onClick={() => onOpenProject('2D Projects')} className="github-border github-bg rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors group">
+                                    <div className="flex items-start gap-3">
                                         <i className="fas fa-gamepad text-gray-500 mt-1 group-hover:text-pink-400 transition-colors"></i>
                                         <div>
                                             <h3 className="text-blue-400 font-semibold group-hover:underline text-lg">2D Projects</h3>
@@ -229,6 +259,7 @@
                                         </div>
                                     </div>
                                 </div>
+
 
                                 {/* Folder 2: Real Hardware Project */}
                                 <div onClick={() => onOpenProject('real Hardwear projects')} className="github-border github-bg rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors group">
