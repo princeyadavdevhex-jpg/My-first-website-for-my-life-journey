@@ -36,9 +36,7 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // ==========================================
-        // 1. FIREBASE SETUP & DATABASE
-        // ==========================================
+        // --- FIREBASE SETUP ---
         const firebaseConfig = {
             apiKey: "AIzaSyAwrlhB5ZQFMaA6wmNC8oXp0_sWVAASrPY", 
             authDomain: "work-space-packet.firebaseapp.com",
@@ -48,7 +46,6 @@
             appId: "1:841757590804:web:9cfe37ee00609b6c046e01"
         };
         if (!window.firebase.apps.length) window.firebase.initializeApp(firebaseConfig);
-        
         const auth = window.firebase.auth();
         const db = window.firebase.firestore();
         const githubProvider = new window.firebase.auth.GithubAuthProvider();
@@ -57,16 +54,11 @@
         const saveUser = (user) => {
             if(!user) return;
             db.collection("users").doc(user.uid).set({
-                email: user.email, 
-                name: user.displayName || "Workspace User", 
-                photoURL: user.photoURL || "", 
-                lastLogin: window.firebase.firestore.FieldValue.serverTimestamp()
+                email: user.email, name: user.displayName || "Workspace User", photoURL: user.photoURL || "", lastLogin: window.firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
         };
 
-        // ==========================================
-        // 2. SIGN UP MODAL
-        // ==========================================
+        // --- SIGN UP MODAL (TUMHARA PURANA LOGIC) ---
         function SignUpModal({ isOpen, onClose }) {
             const [email, setEmail] = useState("");
             const [password, setPassword] = useState("");
@@ -93,16 +85,14 @@
                         <form onSubmit={handleEmail} className="flex flex-col gap-4">
                             <input type="email" required placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} className="w-full bg-[#0d1117] border border-[#30363d] rounded px-4 py-2 text-white outline-none" />
                             <input type="password" required placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} className="w-full bg-[#0d1117] border border-[#30363d] rounded px-4 py-2 text-white outline-none" />
-                            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded mt-2 shadow-[0_0_15px_rgba(59,130,246,0.3)]">Create Account</button>
+                            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded mt-2">Create Account</button>
                         </form>
                     </div>
                 </div>
             );
         }
 
-        // ==========================================
-        // 3. NAVBAR (WITH SECURE MANAGE BUTTON)
-        // ==========================================
+        // --- NAVBAR (TUMHARA UI + ADMIN BUTTON) ---
         function Navbar({ setView, onOpenProject, user }) {
             const [isSignUpOpen, setIsSignUpOpen] = useState(false);
             return (
@@ -114,6 +104,9 @@
                             </div>
                             <div className="flex justify-center gap-6 text-sm font-semibold">
                                 <span onClick={() => setView('home')} className="text-white hover:text-blue-400 cursor-pointer">Home</span>
+                                {/* TUMHARI PURANI LINKS BHI HAIN */}
+                                <span onClick={() => onOpenProject({name: '2D Projects'})} className="text-gray-400 hover:text-white cursor-pointer">2D Projects</span>
+                                <span onClick={() => onOpenProject({name: 'Real Hardware Project'})} className="text-gray-400 hover:text-white cursor-pointer">Real Hardware Project</span>
                             </div>
                             <div className="flex justify-end items-center gap-4">
                                 <a href="https://www.youtube.com/@PRINCE_TECHMOTION_LAB" target="_blank" className="text-gray-400 hover:text-red-500"><i className="fab fa-youtube text-xl"></i></a>
@@ -121,11 +114,11 @@
                                 
                                 {user ? (
                                     <div className="flex items-center gap-3">
-                                        {/* PRINCE BHAI KA SECRET ADMIN BUTTON */}
+                                        {/* PRINCE BHAI KA ADMIN BUTTON */}
                                         {user.email === "princeyadavdav.hex@gmail.com" && ( 
                                             <button 
                                                 onClick={() => setView('admin')} 
-                                                className="bg-orange-600 text-white px-3 py-1.5 rounded-md text-xs font-black shadow-[0_0_10px_rgba(234,88,12,0.5)] hover:bg-orange-700 transition-all mr-1"
+                                                className="bg-orange-600 text-white px-3 py-1.5 rounded-md text-xs font-black shadow-lg hover:bg-orange-700 transition-all mr-1"
                                             >
                                                 <i className="fas fa-user-shield mr-1"></i> MANAGE
                                             </button>
@@ -144,9 +137,7 @@
             );
         }
 
-        // ==========================================
-        // 4. HOME VIEW (DYNAMIC FOLDERS)
-        // ==========================================
+        // --- HOME VIEW (TUMHARA UI + DYNAMIC FOLDERS) ---
         function HomeView({ onOpenProject }) {
             const [folders, setFolders] = useState([]);
             
@@ -159,7 +150,11 @@
 
             useEffect(() => {
                 const unsub = db.collection("folders").orderBy("timestamp", "desc").onSnapshot(snap => {
-                    setFolders(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                    const folderList = snap.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+                    setFolders(folderList);
                 });
                 return () => unsub();
             }, []);
@@ -204,15 +199,21 @@
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {folders.length === 0 ? (
-                                    <p className="text-gray-500 italic text-sm py-4">Abhi koi folder nahi hai, Admin se naya banayein! 📁</p>
+                                    <p className="text-gray-500 italic text-sm py-4">Abhi koi folder nahi hai, Admin se naya dalo!</p>
                                 ) : (
                                     folders.map(f => (
-                                        <div key={f.id} onClick={() => onOpenProject(f)} className="github-border github-bg rounded-lg p-6 hover:border-blue-500 cursor-pointer transition-all group">
+                                        <div 
+                                            key={f.id} 
+                                            onClick={() => onOpenProject(f)} 
+                                            className="github-border github-bg rounded-lg p-6 hover:border-blue-500 cursor-pointer transition-all group"
+                                        >
                                             <div className="flex items-center gap-4">
-                                                <i className="fas fa-folder text-4xl text-orange-500 group-hover:scale-110 transition-transform"></i>
+                                                <i className="fas fa-folder text-4xl text-blue-500 group-hover:scale-110 transition-transform"></i>
                                                 <div>
-                                                    <h3 className="text-blue-400 font-bold group-hover:underline uppercase tracking-tight">{f.name}</h3>
-                                                    <p className="text-[10px] text-gray-500 mt-1 uppercase">Click to open</p>
+                                                    <h3 className="text-white font-bold group-hover:underline uppercase tracking-tight">
+                                                        {f.name}
+                                                    </h3>
+                                                    <p className="text-[10px] text-gray-500 mt-1 uppercase">Click to open files</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -225,9 +226,7 @@
             );
         }
 
-        // ==========================================
-        // 5. ADMIN DASHBOARD (CONTROL CENTER)
-        // ==========================================
+        // --- ADMIN DASHBOARD (NEW LOGIC ONLY) ---
         function AdminDashboard({ goBack }) {
             const [view, setView] = useState('folders');
             const [currentFolder, setCurrentFolder] = useState(null);
@@ -276,12 +275,12 @@
 
             return (
                 <div className="min-h-screen bg-[#0d1117] text-white p-6 md:p-12 z-50 absolute inset-0 overflow-y-auto">
-                    <div className="max-w-7xl mx-auto flex justify-between items-center mb-10 border-b border-gray-800 pb-8">
+                    <div className="max-w-7xl mx-auto flex justify-between items-center mb-10 border-b border-[#30363d] pb-8">
                         <h1 className="text-3xl md:text-4xl font-black text-orange-500 uppercase">Nexus Management</h1>
                         <button onClick={goBack} className="bg-white text-black px-8 py-2 md:px-10 md:py-3 rounded-2xl font-black">EXIT</button>
                     </div>
 
-                    <div className="max-w-7xl mx-auto mb-10 bg-[#161b22] p-4 rounded-2xl border border-gray-800 text-sm font-bold flex flex-wrap gap-3">
+                    <div className="max-w-7xl mx-auto mb-10 bg-[#161b22] p-4 rounded-2xl border border-[#30363d] text-sm font-bold flex flex-wrap gap-3">
                         <span onClick={() => setView('folders')} className="text-blue-400 cursor-pointer">ROOT</span>
                         {currentFolder && <><i className="fas fa-chevron-right text-gray-500 mt-1"></i> <span onClick={() => setView('projects')} className="text-blue-400 cursor-pointer uppercase">{currentFolder.name}</span></>}
                         {currentProject && <><i className="fas fa-chevron-right text-gray-500 mt-1"></i> <span className="text-orange-500 uppercase">{currentProject.name}</span></>}
@@ -291,7 +290,5 @@
                         {view !== 'assets' ? (
                             <div className="space-y-10">
                                 <div className="flex gap-4">
-                                    <input type="text" value={newName} onChange={e => setNewName(e.target.value)} className="flex-1 bg-[#161b22] p-4 md:p-5 rounded-2xl border border-gray-800 outline-none focus:border-orange-500" placeholder={view === 'folders' ? "Create Folder..." : "Create Project Container..."} />
-                                    <button onClick={handlePush} className="bg-orange-600 px-6 md:px-10 rounded-2xl font-black">CREATE</button>
-                                </div>
-                                <div className="grid 
+                                    <input type="text" value={newName} onChange={e => setNewName(e.target.value)} className="flex-1 bg-[#161b22] p-4 md:p-5 rounded-2xl border border-[#30363d] outline-none focus:border-blue-500 text-white" placeholder={view === 'folders' ? "Create Folder..." : "Create Project Container..."} />
+                       
