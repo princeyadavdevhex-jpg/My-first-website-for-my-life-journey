@@ -238,28 +238,30 @@
                                 <div className="flex gap-2">
                                     <button onClick={()=>alert('Copied!')} className="text-xs bg-[#30363d] text-white px-3 py-1.5 rounded"><i className="fas fa-copy"></i> Copy</button>
                                     <button onClick={async () => {
-    // 1. Check karo user login hai ya nahi
+    // 1. Check karo ki user login hai ya nahi
     const user = window.firebase.auth().currentUser;
     
     if (!user) {
-        alert("Bhai, pehle Login/Sign Up karo tabhi toh Prince ko pata chalega kaun ho tum!");
-        return;
+        // Agar login nahi hai, toh message dikhao
+        alert("Pehle Login ya Sign Up karein taaki aapka email save ho sake!");
+        return; 
     }
 
-    // 2. Sirf message pucho
-    const suggestion = prompt("Code mein kya change karna chahiye?");
+    // 2. Agar login hai, toh message pucho
+    const suggestion = prompt("Code mein kya change karna chahiye? (Apna message likhein):");
     
     if (suggestion) {
         try {
+            // 3. Firestore mein data bhejo (with email)
             await db.collection("edit_requests").add({
-                user_email: user.email, // Yeh apne aap login user ka email utha lega!
-                user_name: user.displayName || "Workspace User",
+                user_email: user.email, // Login user ka email apne aap yahan se jayega
+                user_name: user.displayName || "Workspace Member",
                 project: projectName,
                 file: openedFile,
                 message: suggestion,
                 timestamp: window.firebase.firestore.FieldValue.serverTimestamp()
             });
-            alert("Request Prince ke paas pahunch gayi hai! 🚀");
+            alert("Aapki request save ho gayi hai! 🚀");
         } catch (error) {
             alert("Error: " + error.message);
         }
@@ -267,6 +269,7 @@
 }} className="text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white px-3 py-1.5 rounded transition-colors shadow-[0_0_8px_rgba(234,88,12,0.4)]">
     <i className="fas fa-code-pull-request mr-1"></i> Request Edit
 </button>
+
 
 
                                 </div>
