@@ -13,6 +13,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
@@ -44,10 +45,10 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useEffect } = React;
 
         // ==========================================
-        // FIREBASE SETUP
+        // FIREBASE SETUP & DATABASE
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyAwrlhB5ZQFMaA6wmNC8oXp0_sWVAASrPY", 
@@ -62,15 +63,56 @@
             window.firebase.initializeApp(firebaseConfig);
         }
         const auth = window.firebase.auth();
+        const db = window.firebase.firestore();
+        const githubProvider = new window.firebase.auth.GithubAuthProvider();
+        const googleProvider = new window.firebase.auth.GoogleAuthProvider();
+
+        const saveUserToDB = (user) => {
+            if(!user) return;
+            db.collection("users").doc(user.uid).set({
+                email: user.email,
+                name: user.displayName || "Workspace User",
+                photoURL: user.photoURL || "",
+                lastLogin: window.firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true }).catch(err => console.log("DB Error:", err));
+        };
 
         // ==========================================
-        // SIGN UP MODAL
+        // SIGN UP MODAL (100% Working with DB Save)
         // ==========================================
         function SignUpModal({ isOpen, onClose }) {
+            const [email, setEmail] = useState("");
+            const [password, setPassword] = useState("");
+
+            const handleGithubLogin = () => {
+                auth.signInWithPopup(githubProvider).then((result) => {
+                    saveUserToDB(result.user);
+                    alert("Welcome " + (result.user.displayName || "User") + "! Login Successful 🚀");
+                    onClose(); 
+                }).catch((error) => alert("Error: " + error.message));
+            };
+
+            const handleGoogleLogin = () => {
+                auth.signInWithPopup(googleProvider).then((result) => {
+                    saveUserToDB(result.user);
+                    alert("Welcome " + (result.user.displayName || "User") + "! Login Successful 🚀");
+                    onClose(); 
+                }).catch((error) => alert("Error: " + error.message));
+            };
+
+            const handleEmailSignup = (e) => {
+                e.preventDefault();
+                auth.createUserWithEmailAndPassword(email, password).then((userCredential) => {
+                    saveUserToDB(userCredential.user);
+                    alert("Account Created! Welcome 🚀");
+                    onClose();
+                }).catch((error) => alert("Error: " + error.message));
+            };
+
             if (!isOpen) return null;
 
             return (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm transition-all">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in transition-all">
                     <div className="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-md p-8 relative shadow-2xl">
                         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
                             <i className="fas fa-times text-xl"></i>
@@ -78,10 +120,10 @@
                         <h2 className="text-2xl font-bold text-white mb-2 text-center">Join Workspace</h2>
                         
                         <div className="flex flex-col gap-3 mb-6 mt-4">
-                            <button className="flex items-center justify-center gap-3 w-full bg-white text-black font-bold py-2.5 rounded-md hover:bg-gray-200 transition-colors">
+                            <button onClick={handleGoogleLogin} className="flex items-center justify-center gap-3 w-full bg-white text-black font-bold py-2.5 rounded-md hover:bg-gray-200 transition-colors">
                                 <i className="fab fa-google text-red-500 text-lg"></i> Sign up with Google
                             </button>
-                            <button className="flex items-center justify-center gap-3 w-full bg-[#24292e] text-white font-bold py-2.5 rounded-md border border-[#30363d] hover:bg-[#30363d] transition-colors">
+                            <button onClick={handleGithubLogin} className="flex items-center justify-center gap-3 w-full bg-[#24292e] text-white font-bold py-2.5 rounded-md border border-[#30363d] hover:bg-[#30363d] transition-colors">
                                 <i className="fab fa-github text-lg"></i> Sign up with GitHub
                             </button>
                         </div>
@@ -91,16 +133,16 @@
                             <div className="h-px bg-[#30363d] flex-1"></div>
                         </div>
 
-                        <form onSubmit={(e) => { e.preventDefault(); alert("Signup UI Working!"); }} className="flex flex-col gap-4">
+                        <form onSubmit={handleEmailSignup} className="flex flex-col gap-4">
                             <div>
                                 <label className="block text-gray-300 text-sm font-semibold mb-1">Email Address</label>
-                                <input type="email" required placeholder="prince@example.com" className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500" />
+                                <input type="email" required placeholder="prince@example.com" value={email} onChange={(e)=>setEmail(e.target.value)} className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500" />
                             </div>
                             <div>
                                 <label className="block text-gray-300 text-sm font-semibold mb-1">Password</label>
-                                <input type="password" required placeholder="••••••••" className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500" />
+                                <input type="password" required placeholder="••••••••" value={password} onChange={(e)=>setPassword(e.target.value)} className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500" />
                             </div>
-                            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-md transition-colors mt-2">
+                            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-md transition-colors mt-2 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
                                 Create Account
                             </button>
                         </form>
@@ -112,16 +154,16 @@
         // ==========================================
         // NAVBAR COMPONENT
         // ==========================================
-        function Navbar({ setView, onOpenProject }) {
+        function Navbar({ setView, onOpenProject, user }) {
             const [isSignUpOpen, setIsSignUpOpen] = useState(false);
 
             return (
                 <>
                     <nav className="glass-header sticky top-0 z-50 border-b border-[#30363d]">
-                        <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+                        <div className="max-w-6xl mx-auto px-4 py-3 grid grid-cols-1 md:grid-cols-3 items-center gap-4">
                             <div className="flex items-center gap-2 cursor-pointer" onClick={() => setView('home')}>
                                 <i className="fas fa-terminal text-blue-500 text-xl"></i>
-                                <span className="font-bold hidden md:block text-white">Workspace</span>
+                                <span className="font-bold text-white">Workspace</span>
                             </div>
                             <div className="flex justify-center gap-6 text-sm font-semibold">
                                 <span onClick={() => setView('home')} className="text-white hover:text-blue-400 transition-colors cursor-pointer">Home</span>
@@ -129,11 +171,19 @@
                                 <span onClick={() => onOpenProject('Real Hardware Project')} className="text-gray-400 hover:text-white transition-colors cursor-pointer">Real Hardware Project</span>
                             </div>
                             <div className="flex justify-end items-center gap-4">
-                                <a href="https://www.youtube.com/@PRINCE_TECHMOTION_LAB" target="_blank" className="text-gray-400 hover:text-red-500 transition-colors"><i className="fab fa-youtube text-xl"></i></a>
-                                <a href="https://github.com/princeyadavdevhex-jpg" target="_blank" className="text-gray-400 hover:text-white transition-colors"><i className="fab fa-github text-xl"></i></a>
-                                <button onClick={() => setIsSignUpOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-4 py-1.5 rounded-md shadow-[0_0_10px_rgba(59,130,246,0.3)]">
-                                    Sign Up
-                                </button>
+                                <a href="https://www.youtube.com/@PRINCE_TECHMOTION_LAB" target="_blank" className="text-gray-400 hover:text-red-500 transition-colors" title="YouTube"><i className="fab fa-youtube text-xl"></i></a>
+                                <a href="https://github.com/princeyadavdevhex-jpg" target="_blank" className="text-gray-400 hover:text-white transition-colors" title="GitHub"><i className="fab fa-github text-xl"></i></a>
+                                
+                                {user ? (
+                                    <div className="flex items-center gap-3">
+                                        <img src={user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${user.email}`} className="w-8 h-8 rounded-full border border-[#30363d]" alt="Profile" />
+                                        <button onClick={() => auth.signOut()} className="text-red-400 hover:text-red-500 text-sm font-bold">Logout</button>
+                                    </div>
+                                ) : (
+                                    <button onClick={() => setIsSignUpOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-4 py-1.5 rounded-md shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+                                        Sign Up
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </nav>
@@ -159,7 +209,7 @@
                                     </div>
                                     <div className="pb-2">
                                         <h1 className="text-2xl md:text-3xl font-bold text-white">Prince Yadav</h1>
-                                        <p className="text-gray-400 text-sm">@princeyadav • C++ & Tech Explorer</p>
+                                        <p className="text-gray-400 text-sm">@princeyadavdevhex-jpg • C++ & Tech Explorer</p>
                                     </div>
                                 </div>
                                 <div className="mt-4 md:mt-0 pb-2">
@@ -238,51 +288,6 @@
                                 <h2 className="text-lg font-semibold border-b border-[#30363d] pb-2 mb-4 text-white">README.md</h2>
                                 <div className="text-gray-300 text-sm leading-relaxed font-mono">
                                     <p className="mb-2">&gt; Hi, I'm Prince! 👋</p>
-                                    <p className="mb-2">&gt; I am a student at JNV Prayagraj passionate about system architectures, web dev, and coding.</p>
+                                    <p className="mb-2">&gt; I am a student in Class 8 at JNV Prayagraj passionate about system architectures, web dev, and ethical hacking.</p>
                                     <p className="mb-2">&gt; Feel free to open any project folder above, review my code, and propose edits if you find bugs!</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-        // ==========================================
-        // PROJECT DETAIL VIEW COMPONENT
-        // ==========================================
-        function ProjectView({ projectName, goBack }) {
-            const [openedFile, setOpenedFile] = useState(null);
-
-            const dummyCode = "// C++ Logic for " + projectName + "\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"Welcome to " + projectName + "!\" << endl;\n    return 0;\n}";
-
-            if (!openedFile) {
-                return (
-                    <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
-                        <button onClick={goBack} className="mb-6 text-blue-400 hover:text-white font-semibold"><i className="fas fa-arrow-left mr-2"></i>Back to Home</button>
-                        <div className="github-border github-bg rounded-xl p-8">
-                            <h2 className="text-3xl font-bold text-white mb-6 border-b border-[#30363d] pb-4"><i className="fas fa-folder-open text-yellow-500 mr-3"></i> {projectName}</h2>
-                            <p className="text-gray-400 mb-6">Select a file to open:</p>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div onClick={() => setOpenedFile('main.cpp')} className="bg-[#0d1117] border border-[#30363d] rounded-lg p-4 hover:border-blue-500 cursor-pointer flex items-center gap-4">
-                                    <i className="fas fa-file-code text-3xl text-blue-400"></i>
-                                    <div><h3 className="text-white font-bold">main.cpp</h3><p className="text-sm text-gray-500">Source Code</p></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                );
-            }
-
-            return (
-                <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
-                    <button onClick={() => setOpenedFile(null)} className="mb-6 text-blue-400 hover:text-white font-semibold"><i className="fas fa-arrow-left mr-2"></i>Back to Folder</button>
-                    
-                    <div className="github-border github-bg rounded-xl p-6">
-                        <h2 className="text-2xl font-bold text-white mb-6 border-b border-[#30363d] pb-4"><i className="fas fa-file-code text-blue-400 mr-3"></i> {openedFile}</h2>
-                        
-                        {/* CODE SECTION */}
-                        <div className="mb-8">
-                            <div className="flex justify-between items-center bg-[#161b22] border border-[#30363d] border-b-0 rounded-t-lg px-4 py-2">
-                                <span className="text-gray-400 text-sm">Source Code</span>
-                                <div className="flex gap-
+                                
