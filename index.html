@@ -8,26 +8,49 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
 
     <style>
-        body { background-color: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        body { 
+            background-color: #0d1117; 
+            color: #c9d1d9; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
+            margin: 0;
+            padding: 0;
+        }
         .github-border { border: 1px solid #30363d; }
         .github-bg { background-color: #161b22; }
         .glass-header { background: rgba(13, 17, 23, 0.9); backdrop-filter: blur(10px); }
+        
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0d1117; }
         ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #8b949e; }
+        
         pre[class*="language-"] { border-radius: 0 0 8px 8px; margin: 0; background: #0d1117; }
-        .profile-banner { background-image: url('https://prince-tech-labs-workspace.vercel.app/1774681471566.png'); background-size: cover; background-position: center; background-repeat: no-repeat; }
+        
+        .profile-banner { 
+            background-image: url('https://prince-tech-labs-workspace.vercel.app/1774681471566.png'); 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat; 
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
     </style>
 </head>
 <body>
@@ -36,7 +59,9 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // --- FIREBASE SETUP ---
+        // ==========================================
+        // 1. FIREBASE SETUP
+        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyAwrlhB5ZQFMaA6wmNC8oXp0_sWVAASrPY", 
             authDomain: "work-space-packet.firebaseapp.com",
@@ -45,7 +70,10 @@
             messagingSenderId: "841757590804",
             appId: "1:841757590804:web:9cfe37ee00609b6c046e01"
         };
-        if (!window.firebase.apps.length) window.firebase.initializeApp(firebaseConfig);
+        
+        if (!window.firebase.apps.length) {
+            window.firebase.initializeApp(firebaseConfig);
+        }
         const auth = window.firebase.auth();
         const db = window.firebase.firestore();
         const githubProvider = new window.firebase.auth.GithubAuthProvider();
@@ -54,80 +82,118 @@
         const saveUser = (user) => {
             if(!user) return;
             db.collection("users").doc(user.uid).set({
-                email: user.email, name: user.displayName || "Workspace User", photoURL: user.photoURL || "", lastLogin: window.firebase.firestore.FieldValue.serverTimestamp()
+                email: user.email, 
+                name: user.displayName || "Workspace User", 
+                photoURL: user.photoURL || "", 
+                lastLogin: window.firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
         };
 
-        // --- SIGN UP MODAL (TUMHARA PURANA LOGIC) ---
+        // ==========================================
+        // 2. SIGN UP MODAL COMPONENT
+        // ==========================================
         function SignUpModal({ isOpen, onClose }) {
             const [email, setEmail] = useState("");
             const [password, setPassword] = useState("");
+            
             if (!isOpen) return null;
 
             const handleLogin = (provider) => {
-                auth.signInWithPopup(provider).then(res => { saveUser(res.user); alert("Welcome!"); onClose(); }).catch(e => alert(e.message));
+                auth.signInWithPopup(provider)
+                    .then(res => { saveUser(res.user); alert("Welcome!"); onClose(); })
+                    .catch(e => alert(e.message));
             };
+            
             const handleEmail = (e) => {
                 e.preventDefault();
-                auth.createUserWithEmailAndPassword(email, password).then(res => { saveUser(res.user); alert("Account Created!"); onClose(); }).catch(e => alert(e.message));
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(res => { saveUser(res.user); alert("Account Created!"); onClose(); })
+                    .catch(e => alert(e.message));
             };
 
             return (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm transition-all">
-                    <div className="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-md p-8 relative shadow-2xl">
-                        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white"><i className="fas fa-times text-xl"></i></button>
+                    <div className="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-md p-8 relative shadow-2xl animate-fade-in">
+                        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white">
+                            <i className="fas fa-times text-xl"></i>
+                        </button>
                         <h2 className="text-2xl font-bold text-white mb-6 text-center">Join Workspace</h2>
+                        
                         <div className="flex flex-col gap-3 mb-6">
-                            <button onClick={()=>handleLogin(googleProvider)} className="flex justify-center gap-3 w-full bg-white text-black font-bold py-2.5 rounded hover:bg-gray-200"><i className="fab fa-google text-red-500 text-lg"></i> Sign up with Google</button>
-                            <button onClick={()=>handleLogin(githubProvider)} className="flex justify-center gap-3 w-full bg-[#24292e] text-white font-bold py-2.5 rounded border border-[#30363d] hover:bg-[#30363d]"><i className="fab fa-github text-lg"></i> Sign up with GitHub</button>
+                            <button onClick={()=>handleLogin(googleProvider)} className="flex justify-center items-center gap-3 w-full bg-white text-black font-bold py-2.5 rounded hover:bg-gray-200 transition-colors">
+                                <i className="fab fa-google text-red-500 text-lg"></i> Sign up with Google
+                            </button>
+                            <button onClick={()=>handleLogin(githubProvider)} className="flex justify-center items-center gap-3 w-full bg-[#24292e] text-white font-bold py-2.5 rounded border border-[#30363d] hover:bg-[#30363d] transition-colors">
+                                <i className="fab fa-github text-lg"></i> Sign up with GitHub
+                            </button>
                         </div>
-                        <div className="flex items-center gap-3 mb-6"><div className="h-px bg-[#30363d] flex-1"></div><span className="text-gray-500 text-xs uppercase font-semibold">Or Email</span><div className="h-px bg-[#30363d] flex-1"></div></div>
+                        
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="h-px bg-[#30363d] flex-1"></div>
+                            <span className="text-gray-500 text-xs uppercase font-semibold">Or Email</span>
+                            <div className="h-px bg-[#30363d] flex-1"></div>
+                        </div>
+                        
                         <form onSubmit={handleEmail} className="flex flex-col gap-4">
-                            <input type="email" required placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} className="w-full bg-[#0d1117] border border-[#30363d] rounded px-4 py-2 text-white outline-none" />
-                            <input type="password" required placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} className="w-full bg-[#0d1117] border border-[#30363d] rounded px-4 py-2 text-white outline-none" />
-                            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded mt-2">Create Account</button>
+                            <input type="email" required placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} className="w-full bg-[#0d1117] border border-[#30363d] rounded px-4 py-2 text-white outline-none focus:border-blue-500 transition-colors" />
+                            <input type="password" required placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} className="w-full bg-[#0d1117] border border-[#30363d] rounded px-4 py-2 text-white outline-none focus:border-blue-500 transition-colors" />
+                            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded mt-2 transition-colors">Create Account</button>
                         </form>
                     </div>
                 </div>
             );
         }
 
-        // --- NAVBAR (TUMHARA UI + ADMIN BUTTON) ---
+        // ==========================================
+        // 3. NAVBAR COMPONENT
+        // ==========================================
         function Navbar({ setView, onOpenProject, user }) {
             const [isSignUpOpen, setIsSignUpOpen] = useState(false);
+            
             return (
                 <>
                     <nav className="glass-header sticky top-0 z-50 border-b border-[#30363d]">
                         <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+                            
+                            {/* Logo */}
                             <div className="flex items-center gap-2 cursor-pointer" onClick={() => setView('home')}>
-                                <i className="fas fa-terminal text-blue-500 text-xl"></i><span className="font-bold hidden md:block text-white">Workspace</span>
+                                <i className="fas fa-terminal text-blue-500 text-xl"></i>
+                                <span className="font-bold hidden md:block text-white tracking-wide">Workspace</span>
                             </div>
+                            
+                            {/* Links */}
                             <div className="flex justify-center gap-6 text-sm font-semibold">
-                                <span onClick={() => setView('home')} className="text-white hover:text-blue-400 cursor-pointer">Home</span>
-                                {/* TUMHARI PURANI LINKS BHI HAIN */}
-                                <span onClick={() => onOpenProject({name: '2D Projects'})} className="text-gray-400 hover:text-white cursor-pointer">2D Projects</span>
-                                <span onClick={() => onOpenProject({name: 'Real Hardware Project'})} className="text-gray-400 hover:text-white cursor-pointer">Real Hardware Project</span>
+                                <span onClick={() => setView('home')} className="text-white hover:text-blue-400 cursor-pointer transition-colors">Home</span>
+                                <span onClick={() => onOpenProject({ name: '2D Projects', id: 'static-2d' })} className="text-gray-400 hover:text-white cursor-pointer transition-colors">2D Projects</span>
+                                <span onClick={() => onOpenProject({ name: 'Real Hardware Project', id: 'static-hw' })} className="text-gray-400 hover:text-white cursor-pointer transition-colors">Real Hardware Project</span>
                             </div>
+                            
+                            {/* User Actions */}
                             <div className="flex justify-end items-center gap-4">
-                                <a href="https://www.youtube.com/@PRINCE_TECHMOTION_LAB" target="_blank" className="text-gray-400 hover:text-red-500"><i className="fab fa-youtube text-xl"></i></a>
-                                <a href="https://github.com/princeyadavdevhex-jpg" target="_blank" className="text-gray-400 hover:text-white"><i className="fab fa-github text-xl"></i></a>
+                                <a href="https://www.youtube.com/@PRINCE_TECHMOTION_LAB" target="_blank" className="text-gray-400 hover:text-red-500 transition-colors">
+                                    <i className="fab fa-youtube text-xl"></i>
+                                </a>
+                                <a href="https://github.com/princeyadavdevhex-jpg" target="_blank" className="text-gray-400 hover:text-white transition-colors">
+                                    <i className="fab fa-github text-xl"></i>
+                                </a>
                                 
                                 {user ? (
                                     <div className="flex items-center gap-3">
-                                        {/* PRINCE BHAI KA ADMIN BUTTON */}
+                                        {/* 🚀 PRINCE BHAI KA SECRET ADMIN BUTTON 🚀 */}
                                         {user.email === "princeyadavdav.hex@gmail.com" && ( 
                                             <button 
                                                 onClick={() => setView('admin')} 
-                                                className="bg-orange-600 text-white px-3 py-1.5 rounded-md text-xs font-black shadow-lg hover:bg-orange-700 transition-all mr-1"
+                                                className="bg-orange-600 text-white px-3 py-1.5 rounded-md text-xs font-black shadow-[0_0_10px_rgba(234,88,12,0.4)] hover:bg-orange-700 transition-all mr-1"
                                             >
                                                 <i className="fas fa-user-shield mr-1"></i> MANAGE
                                             </button>
                                         )}
-                                        <img src={user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${user.email}`} className="w-8 h-8 rounded-full border border-[#30363d]" />
-                                        <button onClick={() => auth.signOut()} className="text-red-400 text-sm font-bold hover:text-red-500">Logout</button>
+                                        
+                                        <img src={user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${user.email}`} className="w-8 h-8 rounded-full border border-[#30363d]" alt="Profile" />
+                                        <button onClick={() => auth.signOut()} className="text-red-400 text-sm font-bold hover:text-red-500 transition-colors">Logout</button>
                                     </div>
                                 ) : (
-                                    <button onClick={() => setIsSignUpOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-4 py-1.5 rounded transition-all">Sign Up</button>
+                                    <button onClick={() => setIsSignUpOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-4 py-1.5 rounded transition-all shadow-lg">Sign Up</button>
                                 )}
                             </div>
                         </div>
@@ -137,7 +203,9 @@
             );
         }
 
-        // --- HOME VIEW (TUMHARA UI + DYNAMIC FOLDERS) ---
+        // ==========================================
+        // 4. HOME VIEW COMPONENT
+        // ==========================================
         function HomeView({ onOpenProject }) {
             const [folders, setFolders] = useState([]);
             
@@ -155,21 +223,24 @@
                         ...doc.data()
                     }));
                     setFolders(folderList);
+                }, (error) => {
+                    console.log("Error fetching folders: ", error);
                 });
                 return () => unsub();
             }, []);
 
             return (
                 <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
-                    <div className="w-full rounded-xl overflow-hidden github-border mb-10">
+                    {/* Banner & Profile Section */}
+                    <div className="w-full rounded-xl overflow-hidden github-border mb-10 shadow-lg">
                         <div className="w-full aspect-[16/9] md:aspect-[21/9] profile-banner relative"></div>
                         <div className="github-bg px-6 pb-6 relative">
                             <div className="flex justify-between items-end -mt-16 mb-4 relative z-10">
                                 <div className="flex items-end gap-4">
-                                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Prince" className="w-32 h-32 rounded-full border-4 border-[#161b22] bg-[#0d1117]" />
+                                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Prince" className="w-32 h-32 rounded-full border-4 border-[#161b22] bg-[#0d1117] shadow-xl" alt="Avatar" />
                                     <div className="pb-2">
-                                        <h1 className="text-3xl font-bold text-white">Prince Yadav</h1>
-                                        <p className="text-gray-400 text-sm">@princeyadavdevhex-jpg • C++ & Tech Explorer</p>
+                                        <h1 className="text-3xl font-bold text-white tracking-tight">Prince Yadav</h1>
+                                        <p className="text-gray-400 text-sm mt-1">@princeyadavdevhex-jpg • C++ & Tech Explorer</p>
                                     </div>
                                 </div>
                             </div>
@@ -177,43 +248,49 @@
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Left Sidebar: Core Skills */}
                         <div className="md:col-span-1">
-                            <div className="bg-[#161b22] github-border rounded-lg p-5">
-                                <h3 className="font-bold border-b border-[#30363d] pb-2 mb-4 text-white">Core Skills</h3>
+                            <div className="bg-[#161b22] github-border rounded-lg p-5 shadow-md">
+                                <h3 className="font-bold border-b border-[#30363d] pb-3 mb-4 text-white text-lg">Core Skills</h3>
                                 <div className="flex flex-col gap-4">
                                     {skills.map(s => (
-                                        <div key={s.name} className="flex items-center gap-3 text-gray-300">
-                                            <i className={`fas ${s.icon} text-lg`}></i> {s.name}
+                                        <div key={s.name} className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors p-2 rounded hover:bg-[#30363d]">
+                                            <i className={`fas ${s.icon} text-xl w-6 text-center`}></i> 
+                                            <span className="font-medium">{s.name}</span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         </div>
 
+                        {/* Right Content: Dynamic Folders */}
                         <div className="md:col-span-2">
-                            <div className="flex justify-between items-center border-b border-[#30363d] pb-2 mb-4">
-                                <h2 className="text-lg font-semibold text-white">
+                            <div className="flex justify-between items-center border-b border-[#30363d] pb-3 mb-5">
+                                <h2 className="text-xl font-bold text-white">
                                     <i className="fas fa-folder-open mr-2 text-yellow-500"></i> Project Repositories
                                 </h2>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {folders.length === 0 ? (
-                                    <p className="text-gray-500 italic text-sm py-4">Abhi koi folder nahi hai, Admin se naya dalo!</p>
+                                    <div className="col-span-2 github-border github-bg rounded-lg p-8 text-center">
+                                        <i className="fas fa-folder-minus text-4xl text-gray-600 mb-3"></i>
+                                        <p className="text-gray-400 font-medium">Abhi koi folder nahi hai. Admin dashboard se naya dalo!</p>
+                                    </div>
                                 ) : (
                                     folders.map(f => (
                                         <div 
                                             key={f.id} 
                                             onClick={() => onOpenProject(f)} 
-                                            className="github-border github-bg rounded-lg p-6 hover:border-blue-500 cursor-pointer transition-all group"
+                                            className="github-border github-bg rounded-lg p-6 hover:border-blue-500 cursor-pointer transition-all group shadow-md"
                                         >
                                             <div className="flex items-center gap-4">
                                                 <i className="fas fa-folder text-4xl text-blue-500 group-hover:scale-110 transition-transform"></i>
                                                 <div>
-                                                    <h3 className="text-white font-bold group-hover:underline uppercase tracking-tight">
+                                                    <h3 className="text-white font-bold group-hover:text-blue-400 tracking-tight text-lg">
                                                         {f.name}
                                                     </h3>
-                                                    <p className="text-[10px] text-gray-500 mt-1 uppercase">Click to open files</p>
+                                                    <p className="text-xs text-gray-500 mt-1 uppercase font-semibold">Click to open files</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -225,70 +302,46 @@
                 </div>
             );
         }
+        
+        // ==========================================
+        // 5. PROJECT VIEW COMPONENT
+        // ==========================================
+        function ProjectView({ project, goBack }) {
+            const [openedFile, setOpenedFile] = useState(null);
+            const projectName = project.name || "Unknown Project";
+            
+            const dummyCode = `// C++ Logic for ${projectName}
+#include <iostream>
+using namespace std;
 
-        // --- ADMIN DASHBOARD (NEW LOGIC ONLY) ---
-        function AdminDashboard({ goBack }) {
-            const [view, setView] = useState('folders');
-            const [currentFolder, setCurrentFolder] = useState(null);
-            const [currentProject, setCurrentProject] = useState(null);
-            const [list, setList] = useState([]);
-            const [loading, setLoading] = useState(false);
-            const [newName, setNewName] = useState('');
-            const [assetData, setAssetData] = useState({ title: '', type: 'code', content: '' });
-            const [selectedFile, setSelectedFile] = useState(null);
+int main() {
+    cout << "Hello Prince!" << endl;
+    cout << "Welcome to the ${projectName} repository." << endl;
+    
+    // Core engine initialization
+    for(int i = 0; i < 5; i++) {
+        cout << "System check " << i << " passed." << endl;
+    }
+    
+    return 0;
+}`;
 
-            useEffect(() => {
-                let col = view === 'folders' ? 'folders' : view === 'projects' ? 'projects' : 'assets';
-                let q = db.collection(col).orderBy("timestamp", "desc");
-                if(view === 'projects' && currentFolder) q = q.where("folderId", "==", currentFolder.id);
-                if(view === 'assets' && currentProject) q = q.where("projectId", "==", currentProject.id);
-                return q.onSnapshot(s => setList(s.docs.map(d => ({id:d.id, ...d.data()}))));
-            }, [view, currentFolder, currentProject]);
+            useEffect(() => { 
+                if (openedFile && window.Prism) {
+                    window.Prism.highlightAll(); 
+                }
+            }, [openedFile]);
 
-            const handlePush = async (e) => {
-                if(e) e.preventDefault();
-                setLoading(true);
-                try {
-                    if(view === 'assets') {
-                        let finalUrl = assetData.content;
-                        if(selectedFile) {
-                            const fd = new FormData();
-                            fd.append('file', selectedFile);
-                            fd.append('upload_preset', 'prince_preset');
-                            const res = await fetch('https://api.cloudinary.com/v1_1/dp2dctx9w/auto/upload', { method: 'POST', body: fd });
-                            const d = await res.json();
-                            finalUrl = d.secure_url;
-                        }
-                        await db.collection("assets").add({ ...assetData, content: finalUrl, projectId: currentProject.id, timestamp: window.firebase.firestore.FieldValue.serverTimestamp() });
-                        setAssetData({ title: '', type: 'code', content: '' }); setSelectedFile(null);
-                    } else {
-                        const col = view === 'folders' ? 'folders' : 'projects';
-                        const data = { name: newName, timestamp: window.firebase.firestore.FieldValue.serverTimestamp() };
-                        if(view === 'projects') data.folderId = currentFolder.id;
-                        await db.collection(col).add(data);
-                        setNewName('');
-                    }
-                    alert("Upload Successful! 🚀");
-                } catch(err) { alert("Error: " + err.message); }
-                setLoading(false);
-            };
-
-            return (
-                <div className="min-h-screen bg-[#0d1117] text-white p-6 md:p-12 z-50 absolute inset-0 overflow-y-auto">
-                    <div className="max-w-7xl mx-auto flex justify-between items-center mb-10 border-b border-[#30363d] pb-8">
-                        <h1 className="text-3xl md:text-4xl font-black text-orange-500 uppercase">Nexus Management</h1>
-                        <button onClick={goBack} className="bg-white text-black px-8 py-2 md:px-10 md:py-3 rounded-2xl font-black">EXIT</button>
-                    </div>
-
-                    <div className="max-w-7xl mx-auto mb-10 bg-[#161b22] p-4 rounded-2xl border border-[#30363d] text-sm font-bold flex flex-wrap gap-3">
-                        <span onClick={() => setView('folders')} className="text-blue-400 cursor-pointer">ROOT</span>
-                        {currentFolder && <><i className="fas fa-chevron-right text-gray-500 mt-1"></i> <span onClick={() => setView('projects')} className="text-blue-400 cursor-pointer uppercase">{currentFolder.name}</span></>}
-                        {currentProject && <><i className="fas fa-chevron-right text-gray-500 mt-1"></i> <span className="text-orange-500 uppercase">{currentProject.name}</span></>}
-                    </div>
-
-                    <div className="max-w-7xl mx-auto">
-                        {view !== 'assets' ? (
-                            <div className="space-y-10">
-                                <div className="flex gap-4">
-                                    <input type="text" value={newName} onChange={e => setNewName(e.target.value)} className="flex-1 bg-[#161b22] p-4 md:p-5 rounded-2xl border border-[#30363d] outline-none focus:border-blue-500 text-white" placeholder={view === 'folders' ? "Create Folder..." : "Create Project Container..."} />
+            if (!openedFile) {
+                return (
+                    <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
+                        <button onClick={goBack} className="mb-6 text-blue-400 hover:text-blue-300 font-semibold transition-colors flex items-center">
+                            <i className="fas fa-arrow-left mr-2"></i> Back to Home
+                        </button>
+                        
+                        <div className="github-border github-bg rounded-xl p-8 min-h-[500px] shadow-lg">
+                            <h2 className="text-3xl font-bold text-white mb-6 border-b border-[#30363d] pb-4 flex items-center">
+                                <i className="fas fa-folder-open text-blue-500 mr-3"></i> {projectName}
+                            </h2>
+                            
                        
