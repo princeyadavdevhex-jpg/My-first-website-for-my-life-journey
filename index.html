@@ -93,114 +93,148 @@
         }
 
         // --- NAVBAR ---
-        function Navbar({ setView, onOpenProject, user }) {
-            const [isSignUpOpen, setIsSignUpOpen] = useState(false);
-            return (
-                <>
-                    <nav className="glass-header sticky top-0 z-50 border-b border-[#30363d]">
-                        <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-                            <div className="flex items-center gap-2 cursor-pointer" onClick={() => setView('home')}>
-                                <i className="fas fa-terminal text-blue-500 text-xl"></i><span className="font-bold hidden md:block text-white">Workspace</span>
-                            </div>
-                            <div className="flex justify-center gap-6 text-sm font-semibold">
-                                <span onClick={() => setView('home')} className="text-white hover:text-blue-400 cursor-pointer">Home</span>
-                                <span onClick={() => onOpenProject('2D Projects')} className="text-gray-400 hover:text-white cursor-pointer">2D Projects</span>
-                                <span onClick={() => onOpenProject('Real Hardware Project')} className="text-gray-400 hover:text-white cursor-pointer">Real Hardware Project</span>
-                            </div>
-                            <div className="flex justify-end items-center gap-4">
-                                <a href="https://www.youtube.com/@PRINCE_TECHMOTION_LAB" target="_blank" className="text-gray-400 hover:text-red-500"><i className="fab fa-youtube text-xl"></i></a>
-                                <a href="https://github.com/princeyadavdevhex-jpg" target="_blank" className="text-gray-400 hover:text-white"><i className="fab fa-github text-xl"></i></a>
-                                {user ? (
-                                    <div className="flex items-center gap-3">
-                                        <img src={user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${user.email}`} className="w-8 h-8 rounded-full border border-[#30363d]" />
-                                        <button onClick={() => auth.signOut()} className="text-red-400 text-sm font-bold">Logout</button>
-                                    </div>
-                                ) : (
-                                    <button onClick={() => setIsSignUpOpen(true)} className="bg-blue-600 text-white text-sm font-bold px-4 py-1.5 rounded">Sign Up</button>
-                                )}
-                            </div>
-                        </div>
-                    </nav>
-                    <SignUpModal isOpen={isSignUpOpen} onClose={() => setIsSignUpOpen(false)} />
-                </>
-            );
-        }
-
+        
         // --- HOME VIEW ---
-        function HomeView({ onOpenProject }) {
-            const projects = [
-                { id: '2D Projects', icon: 'fa-gamepad text-pink-400', tech: 'C++ / Python' },
-                { id: 'Real Hardware Project', icon: 'fa-microchip text-green-400', tech: 'Embedded C++' },
-                { id: 'Nexus OS Architecture', icon: 'fa-laptop-code text-blue-400', tech: 'Assembly' }
-            ];
-            const skills = [
-                { name: 'C++ Architecture', icon: 'fa-code text-blue-500' },
-                { name: 'Python / AI', icon: 'fab fa-python text-yellow-400' },
-                { name: 'Ethical Hacking', icon: 'fa-shield-alt text-green-500' },
-                { name: 'Web Development', icon: 'fa-globe text-cyan-400' }
-            ];
-
-            return (
-                <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
-                    <div className="w-full rounded-xl overflow-hidden github-border mb-10">
-                        <div className="w-full aspect-[16/9] md:aspect-[21/9] profile-banner relative"></div>
-                        <div className="github-bg px-6 pb-6 relative">
-                            <div className="flex justify-between items-end -mt-16 mb-4 relative z-10">
-                                <div className="flex items-end gap-4">
-                                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Prince" className="w-32 h-32 rounded-full border-4 border-[#161b22] bg-[#0d1117]" />
-                                    <div className="pb-2">
-                                        <h1 className="text-3xl font-bold text-white">Prince Yadav</h1>
-                                        <p className="text-gray-400 text-sm">@princeyadavdevhex-jpg • C++ & Tech Explorer</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        
+   
+        // --- NAVBAR ---
+function Navbar({ setView, onOpenProject, user }) {
+    const [isSignUpOpen, setIsSignUpOpen] = useState(false);
+    return (
+        <>
+            <nav className="glass-header sticky top-0 z-50 border-b border-[#30363d]">
+                <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+                    <div className="flex items-center gap-2 cursor-pointer" onClick={() => setView('home')}>
+                        <i className="fas fa-terminal text-blue-500 text-xl"></i><span className="font-bold hidden md:block text-white">Workspace</span>
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="md:col-span-1">
-                            <div className="bg-[#161b22] github-border rounded-lg p-5">
-                                <h3 className="font-bold border-b border-[#30363d] pb-2 mb-4 text-white">Core Skills</h3>
-                                <div className="flex flex-col gap-4">
-                                    {skills.map(s => (
-                                        <div key={s.name} className="flex items-center gap-3 text-gray-300"><i className={`fas ${s.icon} text-lg`}></i> {s.name}</div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
+                    <div className="flex justify-center gap-6 text-sm font-semibold">
+                        <span onClick={() => setView('home')} className="text-white hover:text-blue-400 cursor-pointer">Home</span>
+                        <span onClick={() => onOpenProject('2D Projects')} className="text-gray-400 hover:text-white cursor-pointer">2D Projects</span>
+                        <span onClick={() => onOpenProject('Real Hardware Project')} className="text-gray-400 hover:text-white cursor-pointer">Real Hardware Project</span>
+                    </div>
+                    <div className="flex justify-end items-center gap-4">
+                        <a href="https://www.youtube.com/@PRINCE_TECHMOTION_LAB" target="_blank" className="text-gray-400 hover:text-red-500"><i className="fab fa-youtube text-xl"></i></a>
+                        <a href="https://github.com/princeyadavdevhex-jpg" target="_blank" className="text-gray-400 hover:text-white"><i className="fab fa-github text-xl"></i></a>
                         
-                        <div className="md:col-span-2">
-                            <div className="flex justify-between items-center border-b border-[#30363d] pb-2 mb-4">
-                                <h2 className="text-lg font-semibold text-white"><i className="fas fa-folder-open mr-2 text-yellow-500"></i> Repositories</h2>
+                        {user ? (
+                            <div className="flex items-center gap-3">
+                                {/* 🚀 PRINCE BHAI KA SECRET ADMIN BUTTON YAHAN HAI 🚀 */}
+                                {user.email === "princeyadavdav.hex@gmail.com" && ( 
+                                    <button 
+                                        onClick={() => setView('admin')} 
+                                        className="bg-orange-600 text-white px-3 py-1.5 rounded-md text-xs font-black shadow-lg hover:bg-orange-700 transition-all mr-1"
+                                    >
+                                        <i className="fas fa-user-shield mr-1"></i> MANAGE
+                                    </button>
+                                )}
+                                {/* ------------------------------------------------ */}
+
+                                <img src={user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${user.email}`} className="w-8 h-8 rounded-full border border-[#30363d]" />
+                                <button onClick={() => auth.signOut()} className="text-red-400 text-sm font-bold hover:text-red-500">Logout</button>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {projects.map(p => (
-                                    <div key={p.id} onClick={() => onOpenProject(p.id)} className="github-border github-bg rounded-lg p-4 hover:border-blue-500 cursor-pointer group">
-                                        <div className="flex gap-3">
-                                            <i className={`fas ${p.icon} mt-1`}></i>
-                                            <div>
-                                                <h3 className="text-blue-400 font-semibold group-hover:underline text-lg">{p.id}</h3>
-                                                <span className="text-xs text-gray-400 mt-2 block">{p.tech}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="mt-8 github-border github-bg rounded-lg p-6">
-                                <h2 className="text-lg font-semibold border-b border-[#30363d] pb-2 mb-4 text-white">README.md</h2>
-                                <div className="text-gray-300 text-sm font-mono space-y-2">
-                                    <p>&gt; Hi, I'm Prince! 👋</p>
-                                    <p>&gt; I am a student in Class 8 at JNV Prayagraj passionate about system architectures, web dev, and hacking.</p>
-                                    <p>&gt; Feel free to open any project folder above and review my code!</p>
-                                </div>
+                        ) : (
+                            <button onClick={() => setIsSignUpOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-4 py-1.5 rounded transition-all">Sign Up</button>
+                        )}
+                    </div>
+                </div>
+            </nav>
+            <SignUpModal isOpen={isSignUpOpen} onClose={() => setIsSignUpOpen(false)} />
+        </>
+    );
+}
+// --- PROJECT VIEW function HomeView({ onOpenProject }) {
+    const [folders, setFolders] = useState([]);
+    
+    // Skills static hi rahengi (kyunki ye tumhari pehchan hai!)
+    const skills = [
+        { name: 'C++ Architecture', icon: 'fa-code text-blue-500' },
+        { name: 'Python / AI', icon: 'fab fa-python text-yellow-400' },
+        { name: 'Ethical Hacking', icon: 'fa-shield-alt text-green-500' },
+        { name: 'Web Development', icon: 'fa-globe text-cyan-400' }
+    ];
+
+    // 1. Firebase se Folders khichne ka logic
+    useEffect(() => {
+        const unsub = db.collection("folders").orderBy("timestamp", "desc").onSnapshot(snap => {
+            const folderList = snap.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setFolders(folderList);
+        });
+        return () => unsub();
+    }, []);
+
+    return (
+        <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
+            {/* Banner & Profile Section */}
+            <div className="w-full rounded-xl overflow-hidden github-border mb-10">
+                <div className="w-full aspect-[16/9] md:aspect-[21/9] profile-banner relative"></div>
+                <div className="github-bg px-6 pb-6 relative">
+                    <div className="flex justify-between items-end -mt-16 mb-4 relative z-10">
+                        <div className="flex items-end gap-4">
+                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Prince" className="w-32 h-32 rounded-full border-4 border-[#161b22] bg-[#0d1117]" />
+                            <div className="pb-2">
+                                <h1 className="text-3xl font-bold text-white">Prince Yadav</h1>
+                                <p className="text-gray-400 text-sm">@princeyadavdevhex-jpg • C++ & Tech Explorer</p>
                             </div>
                         </div>
                     </div>
                 </div>
-            );
-        }
+            </div>
 
-        // --- PROJECT VIEW ---
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Left Sidebar: Core Skills */}
+                <div className="md:col-span-1">
+                    <div className="bg-[#161b22] github-border rounded-lg p-5">
+                        <h3 className="font-bold border-b border-[#30363d] pb-2 mb-4 text-white">Core Skills</h3>
+                        <div className="flex flex-col gap-4">
+                            {skills.map(s => (
+                                <div key={s.name} className="flex items-center gap-3 text-gray-300">
+                                    <i className={`fas ${s.icon} text-lg`}></i> {s.name}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Content: Dynamic Folders */}
+                <div className="md:col-span-2">
+                    <div className="flex justify-between items-center border-b border-[#30363d] pb-2 mb-4">
+                        <h2 className="text-lg font-semibold text-white">
+                            <i className="fas fa-folder-open mr-2 text-yellow-500"></i> Project Repositories
+                        </h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {folders.length === 0 ? (
+                            <p className="text-gray-500 italic text-sm py-4">Abhi koi folder nahi hai, Admin se naya dalo!</p>
+                        ) : (
+                            folders.map(f => (
+                                <div 
+                                    key={f.id} 
+                                    onClick={() => onOpenProject(f)} 
+                                    className="github-border github-bg rounded-lg p-6 hover:border-blue-500 cursor-pointer transition-all group"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <i className="fas fa-folder text-4xl text-orange-500 group-hover:scale-110 transition-transform"></i>
+                                        <div>
+                                            <h3 className="text-blue-400 font-bold group-hover:underline uppercase tracking-tight">
+                                                {f.name}
+                                            </h3>
+                                            <p className="text-[10px] text-gray-500 mt-1 uppercase">Click to open files</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+        
         function ProjectView({ projectName, goBack }) {
             const [openedFile, setOpenedFile] = useState(null);
             const dummyCode = "// C++ Logic for " + projectName + "\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"Hello Prince!\" << endl;\n    return 0;\n}";
@@ -291,6 +325,109 @@
             );
         }
 
+
+
+        function AdminDashboard({ goBack }) {
+    const [view, setView] = useState('folders');
+    const [currentFolder, setCurrentFolder] = useState(null);
+    const [currentProject, setCurrentProject] = useState(null);
+    const [list, setList] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [newName, setNewName] = useState('');
+    const [assetData, setAssetData] = useState({ title: '', type: 'code', content: '' });
+    const [selectedFile, setSelectedFile] = useState(null);
+
+    useEffect(() => {
+        let col = view === 'folders' ? 'folders' : view === 'projects' ? 'projects' : 'assets';
+        let q = db.collection(col).orderBy("timestamp", "desc");
+        if(view === 'projects' && currentFolder) q = q.where("folderId", "==", currentFolder.id);
+        if(view === 'assets' && currentProject) q = q.where("projectId", "==", currentProject.id);
+        return q.onSnapshot(s => setList(s.docs.map(d => ({id:d.id, ...d.data()}))));
+    }, [view, currentFolder, currentProject]);
+
+    const handlePush = async (e) => {
+        if(e) e.preventDefault();
+        setLoading(true);
+        try {
+            if(view === 'assets') {
+                let finalUrl = assetData.content;
+                if(selectedFile) {
+                    const fd = new FormData();
+                    fd.append('file', selectedFile);
+                    fd.append('upload_preset', 'prince_preset');
+                    const res = await fetch('https://api.cloudinary.com/v1_1/dp2dctx9w/auto/upload', { method: 'POST', body: fd });
+                    const d = await res.json();
+                    finalUrl = d.secure_url;
+                }
+                await db.collection("assets").add({ ...assetData, content: finalUrl, projectId: currentProject.id, timestamp: window.firebase.firestore.FieldValue.serverTimestamp() });
+                setAssetData({ title: '', type: 'code', content: '' }); setSelectedFile(null);
+            } else {
+                const col = view === 'folders' ? 'folders' : 'projects';
+                const data = { name: newName, timestamp: window.firebase.firestore.FieldValue.serverTimestamp() };
+                if(view === 'projects') data.folderId = currentFolder.id;
+                await db.collection(col).add(data);
+                setNewName('');
+            }
+            alert("Upload Successful! 🚀");
+        } catch(err) { alert("Error: " + err.message); }
+        setLoading(false);
+    };
+
+    return (
+        <div className="min-h-screen bg-[#0d1117] text-white p-6 md:p-12 z-50 absolute inset-0">
+            <div className="max-w-7xl mx-auto flex justify-between items-center mb-10 border-b border-gray-800 pb-8">
+                <h1 className="text-4xl font-black text-orange-500 uppercase">Nexus Management</h1>
+                <button onClick={goBack} className="bg-white text-black px-10 py-3 rounded-2xl font-black">EXIT</button>
+            </div>
+
+            <div className="max-w-7xl mx-auto mb-10 bg-[#161b22] p-4 rounded-2xl border border-gray-800 text-sm font-bold flex gap-3">
+                <span onClick={() => setView('folders')} className="text-blue-400 cursor-pointer">ROOT</span>
+                {currentFolder && <><i className="fas fa-chevron-right text-gray-500"></i> <span onClick={() => setView('projects')} className="text-blue-400 cursor-pointer">{currentFolder.name}</span></>}
+                {currentProject && <><i className="fas fa-chevron-right text-gray-500"></i> <span className="text-orange-500">{currentProject.name}</span></>}
+            </div>
+
+            <div className="max-w-7xl mx-auto">
+                {view !== 'assets' ? (
+                    <div className="space-y-10">
+                        <div className="flex gap-4">
+                            <input type="text" value={newName} onChange={e => setNewName(e.target.value)} className="flex-1 bg-[#161b22] p-5 rounded-2xl border border-gray-800 outline-none focus:border-orange-500" placeholder={view === 'folders' ? "Create Folder..." : "Create Project..."} />
+                            <button onClick={handlePush} className="bg-orange-600 px-10 rounded-2xl font-black">CREATE</button>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                            {list.map(item => (
+                                <div key={item.id} onClick={() => view === 'folders' ? (setCurrentFolder(item) || setView('projects')) : (setCurrentProject(item) || setView('assets'))} className="bg-[#161b22] p-10 rounded-[35px] border border-gray-800 text-center hover:border-orange-500 cursor-pointer">
+                                    <i className={`fas ${view === 'folders' ? 'fa-folder text-orange-500' : 'fa-project-diagram text-blue-500'} text-6xl mb-4`}></i>
+                                    <p className="font-black text-xl uppercase">{item.name}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                        <div className="bg-[#161b22] p-8 rounded-[40px] border border-gray-800">
+                            <h3 className="font-black text-orange-500 mb-6 text-xl">UPLOAD ASSET</h3>
+                            <form onSubmit={handlePush} className="space-y-6">
+                                <input type="text" placeholder="File Title" value={assetData.title} onChange={e => setAssetData({...assetData, title: e.target.value})} className="w-full bg-[#0d1117] p-5 rounded-2xl border border-gray-700" required />
+                                <select value={assetData.type} onChange={e => setAssetData({...assetData, type: e.target.value})} className="w-full bg-[#0d1117] p-5 rounded-2xl border border-gray-700">
+                                    <option value="code">Source Code</option>
+                                    <option value="photo">Image / Photo</option>
+                                    <option value="video">Video Link</option>
+                                </select>
+                                <input type="file" onChange={e => setSelectedFile(e.target.files[0])} className="text-xs text-gray-500 w-full" />
+                                <textarea placeholder="Content or URL..." value={assetData.content} onChange={e => setAssetData({...assetData, content: e.target.value})} className="w-full bg-[#0d1117] p-5 rounded-2xl border border-gray-700 h-32"></textarea>
+                                <button type="submit" disabled={loading} className="w-full bg-orange-600 py-5 rounded-2xl font-black">
+                                    {loading ? "UPLOADING..." : "PUSH ASSET"}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+            }
+            
+
         // --- APP ROOT ---
         function App() {
             const [view, setView] = useState('home'); 
@@ -305,6 +442,7 @@
                 <div>
                     <Navbar setView={setView} onOpenProject={openProj} user={user} />
                     {view === 'home' && <HomeView onOpenProject={openProj} />}
+                    {view === 'admin' && <AdminDashboard goBack={() => setView('home')} />}
                     {view === 'project' && <ProjectView projectName={project} goBack={() => setView('home')} />}
                 </div>
             );
