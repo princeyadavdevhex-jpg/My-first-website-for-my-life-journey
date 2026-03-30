@@ -15,6 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
 
@@ -46,7 +47,7 @@
         const { useState } = React;
 
         // ==========================================
-        // SAFE FIREBASE SETUP
+        // FIREBASE SETUP
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyAwrlhB5ZQFMaA6wmNC8oXp0_sWVAASrPY", 
@@ -63,7 +64,7 @@
         const auth = window.firebase.auth();
 
         // ==========================================
-        // SIGN UP MODAL (Pure UI)
+        // SIGN UP MODAL
         // ==========================================
         function SignUpModal({ isOpen, onClose }) {
             if (!isOpen) return null;
@@ -74,19 +75,16 @@
                         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
                             <i className="fas fa-times text-xl"></i>
                         </button>
-                        
                         <h2 className="text-2xl font-bold text-white mb-2 text-center">Join Workspace</h2>
                         
                         <div className="flex flex-col gap-3 mb-6 mt-4">
                             <button className="flex items-center justify-center gap-3 w-full bg-white text-black font-bold py-2.5 rounded-md hover:bg-gray-200 transition-colors">
                                 <i className="fab fa-google text-red-500 text-lg"></i> Sign up with Google
                             </button>
-                            
                             <button className="flex items-center justify-center gap-3 w-full bg-[#24292e] text-white font-bold py-2.5 rounded-md border border-[#30363d] hover:bg-[#30363d] transition-colors">
                                 <i className="fab fa-github text-lg"></i> Sign up with GitHub
                             </button>
                         </div>
-
                         <div className="flex items-center gap-3 mb-6">
                             <div className="h-px bg-[#30363d] flex-1"></div>
                             <span className="text-gray-500 text-xs uppercase font-semibold">Or continue with email</span>
@@ -96,11 +94,11 @@
                         <form onSubmit={(e) => { e.preventDefault(); alert("Signup UI Working!"); }} className="flex flex-col gap-4">
                             <div>
                                 <label className="block text-gray-300 text-sm font-semibold mb-1">Email Address</label>
-                                <input type="email" required placeholder="prince@example.com" className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors" />
+                                <input type="email" required placeholder="prince@example.com" className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500" />
                             </div>
                             <div>
                                 <label className="block text-gray-300 text-sm font-semibold mb-1">Password</label>
-                                <input type="password" required placeholder="••••••••" className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors" />
+                                <input type="password" required placeholder="••••••••" className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-2 text-white focus:outline-none focus:border-blue-500" />
                             </div>
                             <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-md transition-colors mt-2">
                                 Create Account
@@ -111,7 +109,7 @@
             );
         }
                         
-                // ==========================================
+        // ==========================================
         // NAVBAR COMPONENT
         // ==========================================
         function Navbar({ setView, onOpenProject }) {
@@ -145,61 +143,9 @@
         }
 
         // ==========================================
-        // MAIN APP COMPONENT
+        // HOME VIEW COMPONENT
         // ==========================================
-        function App() {
-            const [currentView, setCurrentView] = useState('home'); 
-            const [activeProject, setActiveProject] = useState('');
-
-            const handleOpenProject = (projectName) => {
-                setActiveProject(projectName);
-                setCurrentView('project');
-            };
-
-            return (
-                <div>
-                    <Navbar setView={setCurrentView} onOpenProject={handleOpenProject} />
-                    {currentView === 'home' && <HomeView onOpenProject={handleOpenProject} />}
-                    {currentView === 'project' && <ProjectView projectName={activeProject} goBack={() => setCurrentView('home')} />}
-                </div>
-            );
-        }
-
-
-
-        // ==========================================
-        // BLANK FOLDER VIEW (Jisme tum aage files add karoge)
-        // ==========================================
-        function FolderView({ folderName, goBack }) {
-            return (
-                <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
-                    <button onClick={goBack} className="mb-6 text-blue-400 hover:text-white font-semibold flex items-center gap-2">
-                        <i className="fas fa-arrow-left"></i> Back to Home
-                    </button>
-                    
-                    <div className="github-border github-bg rounded-xl p-8 min-h-[500px]">
-                        <h2 className="text-3xl font-bold text-white mb-4 border-b border-[#30363d] pb-4">
-                            <i className="fas fa-folder-open text-yellow-500 mr-3"></i> {folderName}
-                        </h2>
-                        
-                        <p className="text-gray-400 mb-8">
-                            Welcome to the {folderName} workspace. You can create multiple files and lines of code here later.
-                        </p>
-
-                        {/* YAHAN TUM APNA CODE YA MULTIPLE FILES WALA SYSTEM BANA SAKTE HO LATER */}
-                        <div className="border border-dashed border-[#30363d] rounded-lg p-10 flex flex-col items-center justify-center text-gray-500">
-                            <i className="fas fa-plus-circle text-4xl mb-3 text-blue-500/50"></i>
-                            <p>Upload files or create new code files here</p>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-        // ==========================================
-        // HOME VIEW (Tumhara Exact Original Layout)
-        // ==========================================
-        function HomeView({ setView }) {
+        function HomeView({ onOpenProject }) {
             return (
                 <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
                     {/* Banner & Profile Info */}
@@ -247,7 +193,7 @@
                             </div>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                       {/* Folder 1: 2D Projects */}
+                                {/* Folder 1: 2D Projects */}
                                 <div onClick={() => onOpenProject('2D Projects')} className="github-border github-bg rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors group">
                                     <div className="flex items-start gap-3">
                                         <i className="fas fa-gamepad text-gray-500 mt-1 group-hover:text-pink-400 transition-colors"></i>
@@ -260,9 +206,8 @@
                                     </div>
                                 </div>
 
-
                                 {/* Folder 2: Real Hardware Project */}
-                                <div onClick={() => onOpenProject('real Hardwear projects')} className="github-border github-bg rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors group">
+                                <div onClick={() => onOpenProject('Real Hardware Project')} className="github-border github-bg rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors group">
                                     <div className="flex items-start gap-3">
                                         <i className="fas fa-microchip text-gray-500 mt-1 group-hover:text-green-400 transition-colors"></i>
                                         <div>
@@ -275,7 +220,7 @@
                                 </div>
 
                                 {/* Folder 3: Nexus OS */}
-                                <div onClick={() => onOpenProject('my third project')} className="github-border github-bg rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors group">
+                                <div onClick={() => onOpenProject('Nexus OS Architecture')} className="github-border github-bg rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors group">
                                     <div className="flex items-start gap-3">
                                         <i className="fas fa-laptop-code text-gray-500 mt-1 group-hover:text-blue-400 transition-colors"></i>
                                         <div>
@@ -302,13 +247,14 @@
                 </div>
             );
         }
+
         // ==========================================
-        // 3. PROJECT DETAIL VIEW (Code, Image, PDF, About)
+        // PROJECT DETAIL VIEW COMPONENT
         // ==========================================
         function ProjectView({ projectName, goBack }) {
             const [openedFile, setOpenedFile] = useState(null);
 
-            const dummyCode = "// C++ Logic for " + projectName + "\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"Hello World!\" << endl;\n    return 0;\n}";
+            const dummyCode = "// C++ Logic for " + projectName + "\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"Welcome to " + projectName + "!\" << endl;\n    return 0;\n}";
 
             if (!openedFile) {
                 return (
@@ -339,65 +285,4 @@
                         <div className="mb-8">
                             <div className="flex justify-between items-center bg-[#161b22] border border-[#30363d] border-b-0 rounded-t-lg px-4 py-2">
                                 <span className="text-gray-400 text-sm">Source Code</span>
-                                <div className="flex gap-2">
-                                    <button onClick={() => alert('Code Copied!')} className="text-xs bg-[#30363d] hover:bg-gray-600 text-white px-3 py-1.5 rounded"><i className="fas fa-copy mr-1"></i> Copy</button>
-                                    <button onClick={() => alert('Request sent to Prince!')} className="text-xs bg-orange-600 hover:bg-orange-500 text-white px-3 py-1.5 rounded"><i className="fas fa-code-pull-request mr-1"></i> Request Edit</button>
-                                </div>
-                            </div>
-                            <div className="border border-[#30363d] rounded-b-lg bg-[#0d1117] p-4 overflow-x-auto">
-                                <pre className="text-green-400 text-sm font-mono m-0"><code>{dummyCode}</code></pre>
-                            </div>
-                        </div>
-
-                        {/* MEDIA SECTION */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                            <div className="border border-[#30363d] rounded-lg p-4 bg-[#0d1117]">
-                                <h3 className="text-white font-bold mb-3 border-b border-[#30363d] pb-2"><i className="fas fa-image text-green-400 mr-2"></i> Images</h3>
-                                <div className="py-8 text-center text-gray-500 border border-dashed border-[#30363d] rounded"><i className="fas fa-upload text-2xl mb-2 block"></i> No images yet</div>
-                            </div>
-                            <div className="border border-[#30363d] rounded-lg p-4 bg-[#0d1117]">
-                                <h3 className="text-white font-bold mb-3 border-b border-[#30363d] pb-2"><i className="fas fa-file-pdf text-red-400 mr-2"></i> PDF / Docs</h3>
-                                <div className="py-8 text-center text-gray-500 border border-dashed border-[#30363d] rounded"><i className="fas fa-file-alt text-2xl mb-2 block"></i> No PDFs yet</div>
-                            </div>
-                        </div>
-
-                        {/* ABOUT SECTION */}
-                        <div className="bg-[#1c2128] border border-blue-500/30 rounded-lg p-6">
-                            <h3 className="text-xl font-bold text-white mb-3"><i className="fas fa-info-circle text-blue-400 mr-2"></i> About This Project</h3>
-                            <div className="text-gray-300 text-sm space-y-2">
-                                <p><strong>Author:</strong> Prince Yadav</p>
-                                <p><strong>Story:</strong> Is project ko maine apne hardware aur coding skills ko test karne ke liye banaya. Yeh mere learning journey ka ek important hissa hai.</p>
-                                <p className="text-gray-400 italic mt-2">Agar koi bug dikhe, toh 'Request Edit' pe click karein!</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-        
-        // ==========================================
-        // MAIN APP COMPONENT
-        // ==========================================
-        function App() {
-            const [currentView, setCurrentView] = useState('home'); 
-
-            return (
-                <div>
-                    <Navbar setView={setCurrentView} />
-                    
-                    {currentView === 'home' && <HomeView setView={setCurrentView} />}
-                    
-                    {currentView !== 'home' && <FolderView folderName={currentView} goBack={() => setCurrentView('home')} />}
-                </div>
-            );
-        }
-
-        // Error-Proof Render
-        const rootElement = document.getElementById('root');
-        if (rootElement) {
-            const root = ReactDOM.createRoot(rootElement);
-            root.render(<App />);
-        }
-    </script>
-</body>
-</html>
+                                <div className="flex gap-
