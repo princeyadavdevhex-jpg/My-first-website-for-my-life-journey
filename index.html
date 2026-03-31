@@ -373,17 +373,16 @@
                     
 
         
-        // ==========================================
-        // 6. ADMIN VIEW COMPONENT (FULL CONTROL)
-        // ==========================================
-                // ==========================================
-        // 6. ADMIN VIEW COMPONENT (FULL CONTROL WITH CODE UPLOAD)
+        
+                  // ==========================================
+        // 6. ADMIN VIEW COMPONENT (FULL CONTROL WITH CODE UPLOAD & FOLDER CREATION)
         // ==========================================
         function AdminView({ setView }) {
             const [selectedFolder, setSelectedFolder] = useState(null);
             const [folders, setFolders] = useState([]);
             const [codeContent, setCodeContent] = useState("");
             const [fileName, setFileName] = useState("");
+            const [newFolderName, setNewFolderName] = useState(""); // Naya folder banane ke liye
 
             useEffect(() => {
                 const unsub = db.collection("folders").orderBy("timestamp", "desc").onSnapshot(snap => {
@@ -391,6 +390,18 @@
                 });
                 return () => unsub();
             }, []);
+
+            // 🚀 NAYA FOLDER BANAO
+            const createFolder = async (e) => {
+                e.preventDefault();
+                if(!newFolderName.trim()) return;
+                await db.collection("folders").add({
+                    name: newFolderName,
+                    timestamp: window.firebase.firestore.FieldValue.serverTimestamp()
+                });
+                setNewFolderName(""); 
+                alert("Naya Folder Ban Gaya!");
+            };
 
             // FIREBASE MEIN DIRECT CODE DALNA
             const saveCode = async () => {
@@ -432,15 +443,30 @@
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* 1. SELECT FOLDER */}
-                        <div className="bg-[#161b22] p-5 rounded-xl border border-[#30363d]">
-                            <h3 className="text-xs font-black text-gray-500 mb-4 uppercase">Step 1: Select Project</h3>
-                            <div className="max-h-[400px] overflow-y-auto pr-2">
-                                {folders.map(f => (
-                                    <button key={f.id} onClick={() => setSelectedFolder(f)} className={`w-full text-left p-3 mb-2 rounded border text-sm font-bold transition-all ${selectedFolder?.id === f.id ? 'border-blue-500 bg-blue-500/10 text-blue-400' : 'border-[#30363d] text-gray-400 hover:border-gray-500'}`}>
-                                        <i className="fas fa-folder mr-2"></i> {f.name}
-                                    </button>
-                                ))}
+                        {/* 1. CREATE & SELECT FOLDER */}
+                        <div className="bg-[#161b22] p-5 rounded-xl border border-[#30363d] flex flex-col gap-6">
+                            
+                            {/* Naya Folder Banane Ka Box */}
+                            <div>
+                                <h3 className="text-xs font-black text-gray-500 mb-3 uppercase">Create New Project</h3>
+                                <form onSubmit={createFolder} className="flex gap-2">
+                                    <input type="text" placeholder="Folder Name..." value={newFolderName} onChange={e=>setNewFolderName(e.target.value)} className="w-full bg-[#0d1117] border border-[#30363d] rounded p-2 text-white outline-none focus:border-orange-500 text-sm" />
+                                    <button type="submit" className="bg-orange-600 px-3 py-2 rounded font-bold text-sm text-white hover:bg-orange-700">Add</button>
+                                </form>
+                            </div>
+
+                            <hr className="border-[#30363d]" />
+
+                            {/* Folder Select Karne Ka Box */}
+                            <div>
+                                <h3 className="text-xs font-black text-gray-500 mb-3 uppercase">Step 1: Select Project</h3>
+                                <div className="max-h-[300px] overflow-y-auto pr-2">
+                                    {folders.map(f => (
+                                        <button key={f.id} onClick={() => setSelectedFolder(f)} className={`w-full text-left p-3 mb-2 rounded border text-sm font-bold transition-all ${selectedFolder?.id === f.id ? 'border-blue-500 bg-blue-500/10 text-blue-400' : 'border-[#30363d] text-gray-400 hover:border-gray-500'}`}>
+                                            <i className="fas fa-folder mr-2"></i> {f.name}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
@@ -465,8 +491,8 @@
                     </div>
                 </div>
             );
-      }
-                                                     
+                               }
+        
 
         // ==========================================
         // 7. MAIN APP COMPONENT
