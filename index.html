@@ -185,7 +185,7 @@
                                 {user ? (
                                     <div className="flex items-center gap-3">
                                         {/* 🚀 PRINCE BHAI KA SECRET ADMIN BUTTON 🚀 */}
-                                            { 
+                                        
                                            {user?.email?.toLowerCase() === "princeyadavdev.hex@gmail.com" && ( 
                                               <button 
                                                 onClick={() => setView('admin')} 
@@ -376,95 +376,97 @@
         // ==========================================
         // 6. ADMIN VIEW COMPONENT (FULL CONTROL)
         // ==========================================
+                // ==========================================
+        // 6. ADMIN VIEW COMPONENT (FULL CONTROL WITH CODE UPLOAD)
+        // ==========================================
         function AdminView({ setView }) {
-            const [newFolderName, setNewFolderName] = useState('');
-            const [requests, setRequests] = useState([]);
+            const [selectedFolder, setSelectedFolder] = useState(null);
             const [folders, setFolders] = useState([]);
-            const [selectedFolderId, setSelectedFolderId] = useState(null);
+            const [codeContent, setCodeContent] = useState("");
+            const [fileName, setFileName] = useState("");
 
             useEffect(() => {
-                // Requests aur Folders dono ko load karna
-                db.collection("edit_requests").orderBy("timestamp", "desc").onSnapshot(snap => setRequests(snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
-                db.collection("folders").orderBy("timestamp", "desc").onSnapshot(snap => setFolders(snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
+                const unsub = db.collection("folders").orderBy("timestamp", "desc").onSnapshot(snap => {
+                    setFolders(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                });
+                return () => unsub();
             }, []);
 
-            const createFolder = async (e) => {
-                e.preventDefault();
-                if(!newFolderName.trim()) return;
-                await db.collection("folders").add({ name: newFolderName, timestamp: window.firebase.firestore.FieldValue.serverTimestamp() });
-                setNewFolderName('');
-                alert("Folder Created!");
+            // FIREBASE MEIN DIRECT CODE DALNA
+            const saveCode = async () => {
+                if(!selectedFolder) return alert("Pehle folder select karo!");
+                await db.collection("files").add({
+                    name: fileName || "code.cpp",
+                    content: codeContent,
+                    type: "code",
+                    folderId: selectedFolder.id,
+                    timestamp: window.firebase.firestore.FieldValue.serverTimestamp()
+                });
+                setCodeContent(""); setFileName(""); alert("Code Added Successfully!");
             };
 
-            const openUpload = () => {
-                if(!selectedFolderId) return alert("Pehle niche se ek Folder select karo!");
+            // CLOUDINARY MEIN MEDIA DALNA
+            const openCloudinary = () => {
+                if(!selectedFolder) return alert("Pehle folder chuno!");
                 window.cloudinary.createUploadWidget({
-                    cloudName: "dp2dctx9w", 
-                    uploadPreset: "prince_preset",
-                    sources: ['local', 'url'],
-                    clientAllowedFormats: ["png", "jpg", "jpeg", "pdf", "mp4"]
-                }, async (error, result) => {
-                    if (!error && result && result.event === "success") {
+                    cloudName: "dp2dctx9w", uploadPreset: "prince_preset"
+                }, async (err, res) => {
+                    if(!err && res.event === "success") {
                         await db.collection("files").add({
-                            name: result.info.original_filename,
-                            url: result.info.secure_url,
-                            type: result.info.resource_type,
-                            folderId: selectedFolderId,
+                            name: res.info.original_filename,
+                            url: res.info.secure_url,
+                            type: res.info.resource_type, // image/video/raw
+                            folderId: selectedFolder.id,
                             timestamp: window.firebase.firestore.FieldValue.serverTimestamp()
                         });
-                        alert("File Linked Successfully! 🚀");
+                        alert("Media Uploaded Successfully!");
                     }
                 }).open();
             };
 
             return (
-                <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
+                <div className="max-w-6xl mx-auto px-4 py-10 animate-fade-in">
                     <div className="flex justify-between items-center mb-8">
-                        <h1 className="text-2xl font-black text-white uppercase"><i className="fas fa-user-shield text-orange-500 mr-2"></i> Admin Control</h1>
-                        <button onClick={() => setView('home')} className="bg-red-600 px-4 py-2 rounded font-bold text-xs">EXIT</button>
+                        <h2 className="text-2xl font-bold text-white"><i className="fas fa-tools text-orange-500 mr-2"></i> Build Project Content</h2>
+                        <button onClick={() => setView('home')} className="bg-red-600 px-4 py-2 rounded font-bold text-xs text-white">EXIT ADMIN</button>
                     </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {/* Folder & Upload Section */}
-                        <div className="github-border github-bg rounded-xl p-6 shadow-xl">
-                            <h2 className="text-white font-bold mb-4 border-b border-[#30363d] pb-2">Manage Media</h2>
-                            <form onSubmit={createFolder} className="flex gap-2 mb-6">
-                                <input type="text" value={newFolderName} onChange={e=>setNewFolderName(e.target.value)} className="bg-[#0d1117] border border-[#30363d] rounded px-3 py-2 text-sm flex-1 outline-none focus:border-orange-500" placeholder="New Folder..."/>
-                                <button type="submit" className="bg-orange-600 px-4 py-2 rounded font-bold">Add</button>
-                            </form>
-                            
-                            <p className="text-xs text-gray-500 mb-2 font-bold uppercase">Select Target Folder:</p>
-                            <div className="flex flex-wrap gap-2 mb-6">
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {/* 1. SELECT FOLDER */}
+                        <div className="bg-[#161b22] p-5 rounded-xl border border-[#30363d]">
+                            <h3 className="text-xs font-black text-gray-500 mb-4 uppercase">Step 1: Select Project</h3>
+                            <div className="max-h-[400px] overflow-y-auto pr-2">
                                 {folders.map(f => (
-                                    <button key={f.id} onClick={() => setSelectedFolderId(f.id)} className={`px-3 py-1.5 rounded text-[10px] font-bold border transition-all ${selectedFolderId === f.id ? 'bg-blue-600 border-blue-400' : 'bg-[#0d1117] border-[#30363d]'}`}>
-                                        {f.name}
+                                    <button key={f.id} onClick={() => setSelectedFolder(f)} className={`w-full text-left p-3 mb-2 rounded border text-sm font-bold transition-all ${selectedFolder?.id === f.id ? 'border-blue-500 bg-blue-500/10 text-blue-400' : 'border-[#30363d] text-gray-400 hover:border-gray-500'}`}>
+                                        <i className="fas fa-folder mr-2"></i> {f.name}
                                     </button>
                                 ))}
                             </div>
-                            <button onClick={openUpload} className="w-full bg-green-600 hover:bg-green-700 text-white font-black py-4 rounded-lg shadow-lg">
-                                <i className="fas fa-cloud-upload-alt mr-2"></i> UPLOAD TO CLOUDINARY
-                            </button>
                         </div>
 
-                        {/* User Requests Section */}
-                        <div className="github-border github-bg rounded-xl p-6 max-h-[500px] overflow-y-auto">
-                            <h2 className="text-white font-bold mb-4 border-b border-[#30363d] pb-2">User Edit Requests</h2>
-                            {requests.map(req => (
-                                <div key={req.id} className="bg-[#0d1117] border border-[#30363d] p-4 rounded-lg mb-3 relative group">
-                                    <p className="text-blue-400 text-xs font-bold uppercase tracking-widest">{req.project}</p>
-                                    <p className="text-gray-300 text-sm mt-1">{req.message}</p>
-                                    <div className="flex justify-between items-center mt-3">
-                                        <span className="text-[10px] text-gray-500 italic">By: {req.user_email}</span>
-                                        <button onClick={() => db.collection("edit_requests").doc(req.id).delete()} className="text-gray-600 hover:text-red-500"><i className="fas fa-trash"></i></button>
-                                    </div>
-                                </div>
-                            ))}
+                        {/* 2. ADD CONTENT */}
+                        <div className="md:col-span-2 space-y-6">
+                            {/* Media Upload */}
+                            <div className="bg-[#161b22] p-6 rounded-xl border-2 border-dashed border-[#30363d] text-center">
+                                <p className="text-gray-400 mb-4 text-sm font-bold uppercase">Step 2: Upload Images/Videos/PDF</p>
+                                <button onClick={openCloudinary} className="bg-green-600 px-8 py-3 rounded-full font-black text-xs text-white shadow-lg hover:bg-green-700 transition-all">
+                                    <i className="fas fa-cloud-upload-alt mr-2"></i> OPEN CLOUDINARY
+                                </button>
+                            </div>
+
+                            {/* Code Editor */}
+                            <div className="bg-[#161b22] p-6 rounded-xl border border-[#30363d]">
+                                <p className="text-gray-400 mb-4 text-sm font-bold uppercase">Step 3: Add Step-by-Step Code/Text</p>
+                                <input type="text" placeholder="File Name (e.g. main.cpp or Step 1)" value={fileName} onChange={e=>setFileName(e.target.value)} className="w-full bg-[#0d1117] border border-[#30363d] rounded p-3 mb-3 text-white outline-none focus:border-blue-500" />
+                                <textarea rows="8" placeholder="Paste your code or tutorial text here..." value={codeContent} onChange={e=>setCodeContent(e.target.value)} className="w-full bg-[#0d1117] border border-[#30363d] rounded p-4 text-sm font-mono text-blue-300 outline-none"></textarea>
+                                <button onClick={saveCode} className="mt-4 bg-blue-600 hover:bg-blue-700 text-white w-full py-3 rounded-lg font-bold shadow-lg transition-all">SAVE CODE TO FIREBASE</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             );
-        }
-        
+      }
+                                                     
 
         // ==========================================
         // 7. MAIN APP COMPONENT
@@ -493,7 +495,8 @@
                     <main className="flex-1">
                         {view === 'home' && <HomeView onOpenProject={handleOpenProject} />}
                         {view === 'project' && currentProject && <ProjectView project={currentProject} goBack={() => setView('home')} />}
-                        {view === 'admin' && user?.email === "princeyadavdev.hex@gmail.com" && <AdminView setView={setView} />}
+                        {view === 'admin' && user?.email?.toLowerCase() === "princeyadavdev.hex@gmail.com" && <AdminView setView={setView} />}
+                        
 
                         
                     </main>
